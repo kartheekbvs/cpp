@@ -7,8 +7,8 @@ export const phase4Content: Record<string, Topic> = {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Nested loops", "Try all combinations", "Generate and test", "When brute force is acceptable"],
-    story: `Imagine you lost your keys somewhere in your house. A **brute force** approach means you check every single room, every drawer, every pocket — systematically exhausting every possibility until you find them. It's not elegant, but it's **guaranteed** to work.\n\nIn programming, brute force means trying **every possible combination** to find the answer. Two numbers that sum to target? Try every pair. Maximum subarray? Check every possible subarray. It's the baseline strategy — simple to code, correct by construction, but often **too slow** for large inputs.\n\nThe key skill is knowing WHEN brute force works (small constraints) and when you MUST optimize. Always start with brute force to understand the problem, then optimize!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `Imagine you lost your keys somewhere in your house. A **brute force** approach means you check every single room, every drawer, every pocket — systematically exhausting every possibility until you find them. It's not elegant, but it's **guaranteed** to work.\n\nIn programming, brute force means trying **every possible combination** to find the answer. Two numbers that sum to target? Try every pair. Maximum subarray? Check every possible subarray. It's the baseline strategy — simple to code, correct by construction, but often **too slow** for large inputs.\n\nThe key skill is knowing WHEN brute force works (small constraints) and when you MUST optimize. Always start with brute force to understand the problem, then optimize!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │          BRUTE FORCE — TRY EVERY POSSIBILITY             │
 │                                                          │
 │  Problem: Find pair that sums to 9                       │
@@ -26,7 +26,7 @@ export const phase4Content: Record<string, Topic> = {
 │                                                          │
 │  TIME: O(n²) — nested loops over all pairs               │
 │  SPACE: O(1) — no extra memory needed                    │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "for (int i = 0; i < n; i++)", explanation: "Outer loop picks first element of the pair", memoryChange: "i = 0, start from beginning", output: "None" },
       { line: "  for (int j = i+1; j < n; j++)", explanation: "Inner loop picks second element (j > i avoids duplicates)", memoryChange: "j starts after i", output: "None" },
@@ -34,7 +34,7 @@ export const phase4Content: Record<string, Topic> = {
       { line: "      return {i, j};", explanation: "Found the answer! Return indices", memoryChange: "Result stored", output: "[0, 1]" },
       { line: "return {-1, -1};", explanation: "No pair found after checking all possibilities", memoryChange: "Default result", output: "[-1, -1]" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 using namespace std;
 
@@ -87,8 +87,8 @@ int main() {
     vector<int> inv = {5, 3, 2, 4, 1};
     cout << "Inversions: " << countInversions(inv) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Brute Force", content: \`// Template: try all pairs
+}`,
+    syntaxCard: { title: "PATTERN: Brute Force", content: `// Template: try all pairs
 for (int i = 0; i < n; i++)
   for (int j = i+1; j < n; j++)
     if (check(i, j)) handle();
@@ -103,7 +103,7 @@ for (int i = 0; i < n; i++) {
 }
 
 // WHEN TO USE: n <= 10^3 (O(n²))
-// WARNING: Always check if TLE before submitting!\` },
+// WARNING: Always check if TLE before submitting!` },
     mistakes: [
       { wrong: "for (int j = 0; j < n; j++) // inner loop from 0", correct: "for (int j = i+1; j < n; j++) // inner loop from i+1", explanation: "Starting inner loop from 0 checks pairs twice (i,j and j,i) and checks i==i. Start from i+1 to avoid duplicates." },
       { wrong: "Thinking brute force is never acceptable", correct: "Brute force works when n is small (n≤1000 for O(n²))", explanation: "For n=1000, O(n²) = 1M operations which runs in ~1ms. Brute force is valid when constraints are small." },
@@ -125,8 +125,8 @@ for (int i = 0; i < n; i++) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Cumulative sum array", "Range sum queries in O(1)", "2D prefix sums", "Difference array"],
-    story: \`Imagine you're a **bank teller** tracking daily deposits. Instead of adding up every day's deposits from scratch each time someone asks "how much was deposited between Day 5 and Day 12?", you keep a **running total**. By Day 12 you know the total is $12,000. By Day 4 it was $3,500. So Day 5–12 deposits = $12,000 − $3,500 = $8,500. Instant answer!\n\nThat's exactly what a **prefix sum** does. You precompute a running total array once in O(n), then every range sum query [L, R] becomes prefix[R] − prefix[L−1] in O(1). Without prefix sums, each query would cost O(n) — for Q queries that's O(nQ). With prefix sums, it's O(n + Q). A massive speedup!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're a **bank teller** tracking daily deposits. Instead of adding up every day's deposits from scratch each time someone asks "how much was deposited between Day 5 and Day 12?", you keep a **running total**. By Day 12 you know the total is $12,000. By Day 4 it was $3,500. So Day 5–12 deposits = $12,000 − $3,500 = $8,500. Instant answer!\n\nThat's exactly what a **prefix sum** does. You precompute a running total array once in O(n), then every range sum query [L, R] becomes prefix[R] − prefix[L−1] in O(1). Without prefix sums, each query would cost O(n) — for Q queries that's O(nQ). With prefix sums, it's O(n + Q). A massive speedup!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │         PREFIX SUM — RANGE SUM IN O(1)                   │
 │                                                          │
 │  Array:     [3,  1,  4,  2,  5,  7,  6]                 │
@@ -143,7 +143,7 @@ for (int i = 0; i < n; i++) {
 │                                                          │
 │  FORMULA: sum(L,R) = prefix[R] - prefix[L-1]            │
 │  BUILD:   O(n)  |  QUERY: O(1)                          │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "vector<int> prefix(n);", explanation: "Allocate prefix sum array of same size", memoryChange: "n integers allocated (all 0)", output: "None" },
       { line: "prefix[0] = arr[0];", explanation: "First prefix is just the first element", memoryChange: "prefix[0] = 3", output: "None" },
@@ -151,7 +151,7 @@ for (int i = 0; i < n; i++) {
       { line: "int rangeSum(int L, int R) { return prefix[R] - (L>0 ? prefix[L-1] : 0); }", explanation: "Range sum = total up to R minus total before L", memoryChange: "No change", output: "Sum of [L,R]" },
       { line: "cout << rangeSum(2, 5);", explanation: "Query sum from index 2 to 5: 22-4=18", memoryChange: "No change", output: "18" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 using namespace std;
 
@@ -203,8 +203,8 @@ int main() {
     PrefixSum2D ps2d(mat);
     cout << "Matrix [0,0]-[1,1]: " << ps2d.rangeSum(0,0,1,1) << endl; // 12
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Prefix Sum", content: \`// 1D Prefix Sum
+}`,
+    syntaxCard: { title: "PATTERN: Prefix Sum", content: `// 1D Prefix Sum
 prefix[0] = arr[0];
 prefix[i] = prefix[i-1] + arr[i];
 sum(L,R) = prefix[R] - prefix[L-1];  // L>0
@@ -215,7 +215,7 @@ pref[i][j] = mat[i-1][j-1] + pref[i-1][j]
             + pref[i][j-1] - pref[i-1][j-1];
 
 // BUILD: O(n)  |  QUERY: O(1)
-// USE FOR: range sum queries, submatrix sums\` },
+// USE FOR: range sum queries, submatrix sums` },
     mistakes: [
       { wrong: "rangeSum(L, R) = prefix[R] - prefix[L]", correct: "rangeSum(L, R) = prefix[R] - prefix[L-1]", explanation: "Subtracting prefix[L] also removes arr[L] from the sum. You need prefix[L-1] to include arr[L] in the result." },
       { wrong: "Forgetting to handle L==0 case", correct: "if (L==0) return prefix[R]; else return prefix[R]-prefix[L-1];", explanation: "When L=0, there's no prefix[-1]. Must handle the edge case separately to avoid out-of-bounds access." },
@@ -237,8 +237,8 @@ pref[i][j] = mat[i-1][j-1] + pref[i-1][j]
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Fixed-size window", "Variable-size window", "Expand and shrink", "Window invariant"],
-    story: \`Imagine you're looking through a **telescope** that can zoom in and out. You slide the telescope across the night sky, adjusting its width to capture exactly the right stars. That's the **sliding window** pattern — you maintain a "window" (a range of elements) and slide it across the array, expanding or shrinking to meet your condition.\n\nFor a **fixed-size** window of length k, you add the new element entering from the right and remove the element leaving from the left — O(1) per step instead of recalculating O(k). For a **variable-size** window, you expand right when the condition isn't met, and shrink left when it is. This two-pointer dance processes each element at most twice, giving O(n) total!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're looking through a **telescope** that can zoom in and out. You slide the telescope across the night sky, adjusting its width to capture exactly the right stars. That's the **sliding window** pattern — you maintain a "window" (a range of elements) and slide it across the array, expanding or shrinking to meet your condition.\n\nFor a **fixed-size** window of length k, you add the new element entering from the right and remove the element leaving from the left — O(1) per step instead of recalculating O(k). For a **variable-size** window, you expand right when the condition isn't met, and shrink left when it is. This two-pointer dance processes each element at most twice, giving O(n) total!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │       SLIDING WINDOW — EXPAND & SHRINK                   │
 │                                                          │
 │  Problem: Longest subarray with sum ≤ k=8                │
@@ -258,7 +258,7 @@ pref[i][j] = mat[i-1][j-1] + pref[i-1][j]
 │                                                          │
 │  EACH ELEMENT: added once (right), removed once (left)   │
 │  TOTAL OPERATIONS: O(n) — not O(n²)!                     │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "int left = 0, sum = 0, maxLen = 0;", explanation: "Initialize window boundaries and tracking variables", memoryChange: "left=0, sum=0, maxLen=0", output: "None" },
       { line: "for (int right = 0; right < n; right++) { sum += arr[right];", explanation: "Expand window by including arr[right]", memoryChange: "sum increases by arr[right]", output: "None" },
@@ -266,7 +266,7 @@ pref[i][j] = mat[i-1][j-1] + pref[i-1][j]
       { line: "  maxLen = max(maxLen, right - left + 1);", explanation: "Update answer with current valid window size", memoryChange: "maxLen updated if larger", output: "None" },
       { line: "}", explanation: "Loop ends, all positions processed", memoryChange: "Final maxLen stored", output: "Maximum length" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <unordered_map>
 using namespace std;
@@ -319,8 +319,8 @@ int main() {
     cout << "Max sum (k=3): " << maxSumWindowK(arr, 3) << endl;
     cout << "Longest 2-distinct: " << longestKDistinct("eceba", 2) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Sliding Window", content: \`// Variable-size window template
+}`,
+    syntaxCard: { title: "PATTERN: Sliding Window", content: `// Variable-size window template
 int left = 0, sum = 0, ans = 0;
 for (int right = 0; right < n; right++) {
     sum += arr[right];       // expand
@@ -337,7 +337,7 @@ for (int i = k; i < n; i++) {
     sum += arr[i] - arr[i-k];  // slide window
     ans = max(ans, sum);
 }
-// TIME: O(n) — each element processed at most twice\` },
+// TIME: O(n) — each element processed at most twice` },
     mistakes: [
       { wrong: "Using if instead of while to shrink window", correct: "Use while to shrink until condition is met", explanation: "With 'if', you only shrink by one element, but the window might still violate the condition. Use 'while' to shrink until valid." },
       { wrong: "Forgetting to update answer inside the loop", correct: "Update maxLen/maxSum after ensuring window is valid", explanation: "The answer must be updated after the while loop ensures the window is valid, not before." },
@@ -359,8 +359,8 @@ for (int i = k; i < n; i++) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Left-right pointers", "Same-direction pointers", "In-place modification", "Sorted array exploitation"],
-    story: \`Think of two people walking from opposite ends of a **bridge** toward each other. The left person starts at the beginning, the right person starts at the end. They move toward each other, checking conditions at each step. When they meet in the middle, they're done!\n\nThat's the **two pointers** pattern. Instead of nested loops checking every pair O(n²), you place one pointer at each end and move them based on a condition. For sorted arrays, this is incredibly powerful — if the sum is too small, move the left pointer right (bigger). If too big, move the right pointer left (smaller). Each step eliminates half the remaining possibilities, giving O(n) instead of O(n²)!\n\nTwo pointers also work in the **same direction** — one reads, one writes — for in-place array modification.\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Think of two people walking from opposite ends of a **bridge** toward each other. The left person starts at the beginning, the right person starts at the end. They move toward each other, checking conditions at each step. When they meet in the middle, they're done!\n\nThat's the **two pointers** pattern. Instead of nested loops checking every pair O(n²), you place one pointer at each end and move them based on a condition. For sorted arrays, this is incredibly powerful — if the sum is too small, move the left pointer right (bigger). If too big, move the right pointer left (smaller). Each step eliminates half the remaining possibilities, giving O(n) instead of O(n²)!\n\nTwo pointers also work in the **same direction** — one reads, one writes — for in-place array modification.`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │          TWO POINTERS — CONVERGE FROM ENDS               │
 │                                                          │
 │  Problem: Find pair summing to 26 in sorted array        │
@@ -380,7 +380,7 @@ for (int i = k; i < n; i++) {
 │                                                          │
 │  KEY: Sorted array → move pointer that helps!            │
 │  sum too small → left++  |  sum too big → right--        │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "int left = 0, right = n - 1;", explanation: "Place pointers at both ends of sorted array", memoryChange: "left=0, right=n-1", output: "None" },
       { line: "while (left < right) {", explanation: "Continue until pointers meet", memoryChange: "No change", output: "None" },
@@ -389,7 +389,7 @@ for (int i = k; i < n; i++) {
       { line: "  else if (sum < target) left++;", explanation: "Sum too small, need bigger number → move left right", memoryChange: "left increments", output: "None" },
       { line: "  else right--;", explanation: "Sum too big, need smaller number → move right left", memoryChange: "right decrements", output: "None" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -454,8 +454,8 @@ int main() {
     vector<int> h = {1,8,6,2,5,4,8,3,7};
     cout << "Max area: " << maxArea(h) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Two Pointers", content: \`// Opposite-direction template (sorted array)
+}`,
+    syntaxCard: { title: "PATTERN: Two Pointers", content: `// Opposite-direction template (sorted array)
 int left = 0, right = n - 1;
 while (left < right) {
     int sum = arr[left] + arr[right];
@@ -471,7 +471,7 @@ for (int read = 0; read < n; read++) {
 }
 
 // REQUIRES: sorted array for pair problems
-// TIME: O(n) | SPACE: O(1)\` },
+// TIME: O(n) | SPACE: O(1)` },
     mistakes: [
       { wrong: "Using two pointers on unsorted array for pair-sum", correct: "Sort the array first, then use two pointers", explanation: "The logic of moving left or right based on sum comparison only works because the array is sorted. On unsorted data, moving a pointer doesn't guarantee increase/decrease." },
       { wrong: "while (left <= right) for pair finding", correct: "while (left < right) — same element can't form a pair", explanation: "When left == right, both pointers point to the same element. A pair requires two different elements." },
@@ -493,8 +493,8 @@ for (int read = 0; read < n; read++) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Cycle detection", "Floyd's Tortoise & Hare", "Find cycle start", "Find middle of list"],
-    story: \`Imagine two runners on a **circular track** — one runs twice as fast as the other. The slow runner (tortoise) takes one step at a time. The fast runner (hare) takes two steps. If the track is circular, the fast runner will eventually **lap** the slow runner — they'll meet at the same spot! But if the track is straight, the fast runner simply reaches the end.\n\nThis is **Floyd's Tortoise and Hare** algorithm. In a linked list with a cycle, the two pointers are guaranteed to meet. To find WHERE the cycle starts, reset one pointer to the head and move both one step at a time — they'll meet at the cycle entrance! This works because the math guarantees it: the distance from head to cycle start equals the distance from meeting point to cycle start (going around the cycle).\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine two runners on a **circular track** — one runs twice as fast as the other. The slow runner (tortoise) takes one step at a time. The fast runner (hare) takes two steps. If the track is circular, the fast runner will eventually **lap** the slow runner — they'll meet at the same spot! But if the track is straight, the fast runner simply reaches the end.\n\nThis is **Floyd's Tortoise and Hare** algorithm. In a linked list with a cycle, the two pointers are guaranteed to meet. To find WHERE the cycle starts, reset one pointer to the head and move both one step at a time — they'll meet at the cycle entrance! This works because the math guarantees it: the distance from head to cycle start equals the distance from meeting point to cycle start (going around the cycle).`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │    FAST & SLOW POINTERS — CYCLE DETECTION                │
 │                                                          │
 │  1 → 2 → 3 → 4 → 5                                      │
@@ -513,7 +513,7 @@ for (int read = 0; read < n; read++) {
 │  They meet at node 4 — cycle start! ✓                    │
 │                                                          │
 │  TIME: O(n)  |  SPACE: O(1) — no hash set needed!       │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "ListNode *slow = head, *fast = head;", explanation: "Both pointers start at the head of the list", memoryChange: "Two pointers initialized", output: "None" },
       { line: "while (fast && fast->next) {", explanation: "Continue while fast can take two steps", memoryChange: "No change", output: "None" },
@@ -521,7 +521,7 @@ for (int read = 0; read < n; read++) {
       { line: "  if (slow == fast) return true; // cycle!", explanation: "If they meet, a cycle exists", memoryChange: "No change", output: "Cycle detected" },
       { line: "return false; // fast reached end", explanation: "Fast pointer hit nullptr — no cycle", memoryChange: "No change", output: "No cycle" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 using namespace std;
 
 struct ListNode {
@@ -584,8 +584,8 @@ int main() {
     n4->next = nullptr; // remove cycle
     cout << "Middle: " << findMiddle(n1)->val << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Fast & Slow Pointers", content: \`// Cycle detection
+}`,
+    syntaxCard: { title: "PATTERN: Fast & Slow Pointers", content: `// Cycle detection
 ListNode *slow = head, *fast = head;
 while (fast && fast->next) {
     slow = slow->next;
@@ -601,7 +601,7 @@ return slow; // cycle entrance
 
 // Find middle of list (same as cycle detection, no cycle)
 // slow ends up at middle node
-// TIME: O(n) | SPACE: O(1)\` },
+// TIME: O(n) | SPACE: O(1)` },
     mistakes: [
       { wrong: "while (fast->next && fast->next->next)", correct: "while (fast && fast->next)", explanation: "You must check fast itself first before accessing fast->next. The correct order prevents null pointer dereference." },
       { wrong: "Moving fast before checking slow==fast", correct: "Move pointers, THEN check if they meet", explanation: "If you check before moving on the initial position (both at head), they'd trivially be equal and give a false positive." },
@@ -623,8 +623,8 @@ return slow; // cycle entrance
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Search space halving", "Lower/upper bound", "Search on answer", "Rotated sorted array"],
-    story: \`Imagine playing **Guess the Number** — I pick a number between 1 and 1000. Each time you guess, I say "too high" or "too low." Your best strategy? Always guess the **middle** — 500, then 250 or 750, etc. Each guess eliminates HALF the remaining numbers! In just 10 guesses, you can find any number in 1 to 1000 (2^10 = 1024).\n\nThat's **binary search** — repeatedly halving the search space. It works whenever there's a **monotonic** property: on one side all answers are "too low" and on the other "too high." This applies beyond sorted arrays — you can binary search on the **answer** itself ("What's the minimum speed to arrive on time?"). The key insight: if speed X works, any speed > X also works — that's a monotonic property!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine playing **Guess the Number** — I pick a number between 1 and 1000. Each time you guess, I say "too high" or "too low." Your best strategy? Always guess the **middle** — 500, then 250 or 750, etc. Each guess eliminates HALF the remaining numbers! In just 10 guesses, you can find any number in 1 to 1000 (2^10 = 1024).\n\nThat's **binary search** — repeatedly halving the search space. It works whenever there's a **monotonic** property: on one side all answers are "too low" and on the other "too high." This applies beyond sorted arrays — you can binary search on the **answer** itself ("What's the minimum speed to arrive on time?"). The key insight: if speed X works, any speed > X also works — that's a monotonic property!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │        BINARY SEARCH — HALVE THE SEARCH SPACE            │
 │                                                          │
 │  Find 7 in sorted array:                                 │
@@ -645,7 +645,7 @@ return slow; // cycle entrance
 │  Find leftmost pass using binary search!                 │
 │                                                          │
 │  TIME: O(log n) — each step halves the space             │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "int lo = 0, hi = n - 1;", explanation: "Initialize search boundaries covering entire array", memoryChange: "lo=0, hi=n-1", output: "None" },
       { line: "while (lo <= hi) {", explanation: "Continue while search space is valid", memoryChange: "No change", output: "None" },
@@ -654,7 +654,7 @@ return slow; // cycle entrance
       { line: "  else if (arr[mid] < target) lo = mid + 1;", explanation: "Target is in right half, discard left", memoryChange: "lo updated", output: "None" },
       { line: "  else hi = mid - 1;", explanation: "Target is in left half, discard right", memoryChange: "hi updated", output: "None" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -719,8 +719,8 @@ int main() {
     vector<int> rot = {4, 5, 6, 7, 0, 1, 2};
     cout << "Find 0 in rotated: " << searchRotated(rot, 0) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Binary Search", content: \`// Classic binary search
+}`,
+    syntaxCard: { title: "PATTERN: Binary Search", content: `// Classic binary search
 int lo = 0, hi = n - 1;
 while (lo <= hi) {
     int mid = lo + (hi - lo) / 2;  // no overflow!
@@ -741,7 +741,7 @@ while (lo < hi) {
     int mid = lo + (hi - lo) / 2;
     if (check(mid)) hi = mid; else lo = mid + 1;
 }
-// TIME: O(log n) | SPACE: O(1)\` },
+// TIME: O(log n) | SPACE: O(1)` },
     mistakes: [
       { wrong: "int mid = (lo + hi) / 2;", correct: "int mid = lo + (hi - lo) / 2;", explanation: "lo + hi can overflow for large values (e.g., both near INT_MAX). The alternative formula avoids overflow." },
       { wrong: "while (lo < hi) for exact-match search", correct: "while (lo <= hi) when you need to check the final element", explanation: "With lo < hi, you skip checking when lo == hi. For exact match, you need lo <= hi to examine every position." },
@@ -754,7 +754,7 @@ while (lo < hi) {
       code: "class Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        int lo = 0, hi = nums.size()-1;\n        while (lo <= hi) {\n            int mid = lo + (hi-lo)/2;\n            if (nums[mid] == target) return mid;\n            else if (nums[mid] < target) lo = mid+1;\n            else hi = mid-1;\n        }\n        return -1;\n    }\n};",
       complexity: "Time: O(log n), Space: O(1)"
     },
-    checkpoint: { question: "Why use \`lo + (hi - lo) / 2\` instead of \`(lo + hi) / 2\`?", options: ["It's faster", "It avoids integer overflow when lo and hi are large", "It gives a different result", "It works with negative numbers"], answer: 1 }
+    checkpoint: { question: "Why use **lo + (hi - lo) / 2** instead of **(lo + hi) / 2**?", options: ["It's faster", "It avoids integer overflow when lo and hi are large", "It gives a different result", "It works with negative numbers"], answer: 1 }
   },
 
   "4.7": {
@@ -763,8 +763,8 @@ while (lo < hi) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Locally optimal choices", "Activity selection", "Greedy exchange proof", "When greedy fails"],
-    story: \`Imagine you're at a **buffet** with a plate that holds exactly 5 items. You want to maximize deliciousness. A greedy strategy: always pick the MOST delicious item available. Sometimes this works perfectly (pick the 5 tastiest dishes). Other times it fails — you skip a medium-tasty dish that would have paired perfectly with two others.\n\n**Greedy algorithms** make the best LOCAL choice at each step, never looking back or reconsidering. When they work, they're incredibly simple and fast. The challenge is **proving** they work — you must show that a locally optimal choice never prevents reaching a globally optimal solution. Use the **exchange argument**: if an optimal solution differs from greedy, swap one choice — it can only improve or stay the same.\n\nClassic example: giving minimum coins for change. With US coins (1,5,10,25), greedy works. With coins (1,3,4) and target 6, greedy gives 4+1+1=3 coins, but optimal is 3+3=2 coins. Greedy isn't always right!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're at a **buffet** with a plate that holds exactly 5 items. You want to maximize deliciousness. A greedy strategy: always pick the MOST delicious item available. Sometimes this works perfectly (pick the 5 tastiest dishes). Other times it fails — you skip a medium-tasty dish that would have paired perfectly with two others.\n\n**Greedy algorithms** make the best LOCAL choice at each step, never looking back or reconsidering. When they work, they're incredibly simple and fast. The challenge is **proving** they work — you must show that a locally optimal choice never prevents reaching a globally optimal solution. Use the **exchange argument**: if an optimal solution differs from greedy, swap one choice — it can only improve or stay the same.\n\nClassic example: giving minimum coins for change. With US coins (1,5,10,25), greedy works. With coins (1,3,4) and target 6, greedy gives 4+1+1=3 coins, but optimal is 3+3=2 coins. Greedy isn't always right!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │          GREEDY — LOCAL = GLOBAL?                        │
 │                                                          │
 │  Activity Selection: choose max non-overlapping          │
@@ -784,7 +784,7 @@ while (lo < hi) {
 │                                                          │
 │  GREEDY CHOICE: always pick earliest finishing           │
 │  TIME: O(n log n) for sorting  |  SPACE: O(1)           │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "sort(activities.begin(), activities.end(), sortByEnd);", explanation: "Sort activities by their end time (greedy criterion)", memoryChange: "Activities reordered by end time", output: "None" },
       { line: "int count = 1, lastEnd = activities[0].end;", explanation: "Pick the first (earliest finishing) activity", memoryChange: "count=1, lastEnd set", output: "None" },
@@ -793,7 +793,7 @@ while (lo < hi) {
       { line: "    count++; lastEnd = activities[i].end;", explanation: "Pick it! Update last end time", memoryChange: "count incremented, lastEnd updated", output: "None" },
       { line: "  }", explanation: "Skip overlapping activities", memoryChange: "No change", output: "Total count" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -850,8 +850,8 @@ int main() {
     vector<pair<int,int>> items = {{10,60},{20,100},{30,120}};
     cout << "Max value: " << fractionalKnapsack(items, 50) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Greedy", content: \`// Greedy template
+}`,
+    syntaxCard: { title: "PATTERN: Greedy", content: `// Greedy template
 1. Identify the greedy choice (what to optimize locally)
 2. Sort by that criterion
 3. Make the choice, update state, repeat
@@ -867,7 +867,7 @@ sort by end time; pick if start >= lastEnd
 
 // WARNING: Greedy doesn't always work!
 // Counter-example: coin change with {1,3,4}, target=6
-// Greedy: 4+1+1=3, Optimal: 3+3=2\` },
+// Greedy: 4+1+1=3, Optimal: 3+3=2` },
     mistakes: [
       { wrong: "Sorting activities by start time for activity selection", correct: "Sort by end time to maximize room for future activities", explanation: "Sorting by start time picks the earliest starting activity, but it might run long and block many others. Sorting by end time ensures you free up the maximum remaining time." },
       { wrong: "Assuming greedy always gives the optimal answer", correct: "Prove greedy works for each specific problem using exchange argument", explanation: "Greedy works for some problems (activity selection, Huffman) but fails for others (0/1 knapsack vs fractional knapsack). Always verify with proof or counter-example." },
@@ -889,8 +889,8 @@ sort by end time; pick if start >= lastEnd
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Frequency maps", "Hash sets for membership", "Counting patterns", "Rabin-Karp rolling hash"],
-    story: \`Imagine you're a **bouncer** at a club with a VIP list. Instead of searching through a notebook page by page (O(n)), you have the names organized so you can instantly check if someone is on the list (O(1)). That's a **hash table** — it maps keys to positions for instant lookup.\n\nIn competitive programming, hashing is your ** Swiss army knife**. Need to count character frequencies? unordered_map<char,int>. Find duplicates? unordered_set. Two-sum in O(n)? Store each number, then for each target check if complement exists. Group anagrams? Hash by sorted string. The pattern: whenever you need **"have I seen this before?"** or **"how many times does this appear?"**, reach for a hash table.\n\nThe trade-off: hash tables use O(n) extra memory, and worst-case is O(n) per operation (hash collisions). But in practice, it's O(1) amortized.\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're a **bouncer** at a club with a VIP list. Instead of searching through a notebook page by page (O(n)), you have the names organized so you can instantly check if someone is on the list (O(1)). That's a **hash table** — it maps keys to positions for instant lookup.\n\nIn competitive programming, hashing is your ** Swiss army knife**. Need to count character frequencies? unordered_map<char,int>. Find duplicates? unordered_set. Two-sum in O(n)? Store each number, then for each target check if complement exists. Group anagrams? Hash by sorted string. The pattern: whenever you need **"have I seen this before?"** or **"how many times does this appear?"**, reach for a hash table.\n\nThe trade-off: hash tables use O(n) extra memory, and worst-case is O(n) per operation (hash collisions). But in practice, it's O(1) amortized.`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │          HASHING — O(1) LOOKUP MAGIC                     │
 │                                                          │
 │  Problem: Two Sum (find pair summing to 9)                │
@@ -912,7 +912,7 @@ sort by end time; pick if start >= lastEnd
 │                                                          │
 │  BRUTE FORCE: O(n²)  |  HASHING: O(n)                   │
 │  SPACE: O(n) for the hash map                            │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "unordered_map<int,int> seen;", explanation: "Create hash map to store value → index", memoryChange: "Empty hash map allocated", output: "None" },
       { line: "for (int i = 0; i < n; i++) {", explanation: "Process each element", memoryChange: "No change", output: "None" },
@@ -920,7 +920,7 @@ sort by end time; pick if start >= lastEnd
       { line: "  if (seen.count(complement)) return {seen[complement], i};", explanation: "Check if complement already seen — O(1) lookup!", memoryChange: "No change", output: "Indices" },
       { line: "  seen[nums[i]] = i;", explanation: "Store current value and its index", memoryChange: "Hash map entry added", output: "None" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -999,8 +999,8 @@ int main() {
     for (int x : dups) cout << x << " ";
     cout << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Hashing", content: \`// Hash map: key → value (frequency, index, etc.)
+}`,
+    syntaxCard: { title: "PATTERN: Hashing", content: `// Hash map: key → value (frequency, index, etc.)
 unordered_map<int,int> freq;
 freq[key]++;               // increment
 freq.count(key)            // check existence
@@ -1017,7 +1017,7 @@ seen.erase(x)              // remove
 // Frequency: freq[key]++
 // Duplicates: check set before inserting
 // Group: hash by key (sorted string, etc.)
-// TIME: O(1) average per operation | SPACE: O(n)\` },
+// TIME: O(1) average per operation | SPACE: O(n)` },
     mistakes: [
       { wrong: "for (auto& [key, val] : freq) { ... } expecting ordered iteration", correct: "Use map (not unordered_map) for ordered keys", explanation: "unordered_map doesn't guarantee any iteration order. Use std::map for sorted key traversal." },
       { wrong: "if (freq[key]) to check existence in map", correct: "if (freq.count(key)) to check without inserting", explanation: "freq[key] creates a default entry (0) if key doesn't exist! Use count() or find() to check without side effects." },
@@ -1030,7 +1030,7 @@ seen.erase(x)              // remove
       code: "class Solution {\npublic:\n    vector<vector<string>> groupAnagrams(vector<string>& strs) {\n        unordered_map<string, vector<string>> groups;\n        for (string& s : strs) {\n            string key = s;\n            sort(key.begin(), key.end());\n            groups[key].push_back(s);\n        }\n        vector<vector<string>> result;\n        for (auto& [k, v] : groups) result.push_back(v);\n        return result;\n    }\n};",
       complexity: "Time: O(n * k log k) where k is max string length, Space: O(n * k)"
     },
-    checkpoint: { question: "What's the danger of using \`freq[key]\` to check if a key exists?", options: ["It crashes if key doesn't exist", "It creates a default entry (0) for missing keys", "It returns the wrong value", "It's slower than count()"], answer: 1 }
+    checkpoint: { question: "What's the danger of using **freq[key]** to check if a key exists?", options: ["It crashes if key doesn't exist", "It creates a default entry (0) for missing keys", "It returns the wrong value", "It's slower than count()"], answer: 1 }
   },
 
   "4.9": {
@@ -1039,8 +1039,8 @@ seen.erase(x)              // remove
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Next greater element", "Next smaller element", "Previous greater/smaller", "Span problems"],
-    story: \`Imagine a line of people of different heights standing in a row, all facing right. Each person wants to know: **"Who is the next person taller than me?"** They can only see people to their right who are visible (not blocked by someone taller in between).\n\nA **monotonic stack** solves this elegantly. Process elements left to right, maintaining a stack that's **always decreasing** (for "next greater"). When a new element arrives, it "knocks out" all stack elements smaller than it — for each knocked-out element, this new element is their **next greater**! The stack stays monotonic (decreasing) because any smaller element below a bigger one would have been knocked out.\n\nThis pattern extends to "next smaller" (increasing stack), "previous greater" (right-to-left processing), and more. Each element is pushed and popped at most once — O(n) total!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine a line of people of different heights standing in a row, all facing right. Each person wants to know: **"Who is the next person taller than me?"** They can only see people to their right who are visible (not blocked by someone taller in between).\n\nA **monotonic stack** solves this elegantly. Process elements left to right, maintaining a stack that's **always decreasing** (for "next greater"). When a new element arrives, it "knocks out" all stack elements smaller than it — for each knocked-out element, this new element is their **next greater**! The stack stays monotonic (decreasing) because any smaller element below a bigger one would have been knocked out.\n\nThis pattern extends to "next smaller" (increasing stack), "previous greater" (right-to-left processing), and more. Each element is pushed and popped at most once — O(n) total!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │      MONOTONIC STACK — NEXT GREATER ELEMENT              │
 │                                                          │
 │  Array:  [4,  5,  2,  25,  7,  8]                       │
@@ -1059,7 +1059,7 @@ seen.erase(x)              // remove
 │                                                          │
 │  Stack is always DECREASING from bottom to top            │
 │  Each element: pushed once, popped once → O(n)           │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "vector<int> nge(n, -1); stack<int> st;", explanation: "Initialize result array and empty monotonic stack", memoryChange: "nge filled with -1, empty stack", output: "None" },
       { line: "for (int i = 0; i < n; i++) {", explanation: "Process each element from left to right", memoryChange: "No change", output: "None" },
@@ -1067,7 +1067,7 @@ seen.erase(x)              // remove
       { line: "    nge[st.top()] = arr[i]; st.pop();", explanation: "Set NGE for popped element, remove from stack", memoryChange: "Result updated, stack shrinks", output: "None" },
       { line: "  st.push(i);", explanation: "Push current index onto stack (might be NGE for future elements)", memoryChange: "Stack grows", output: "None" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <stack>
 using namespace std;
@@ -1150,8 +1150,8 @@ int main() {
     for (int x : dt) cout << x << " ";
     cout << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Monotonic Stack", content: \`// Next Greater Element (decreasing stack)
+}`,
+    syntaxCard: { title: "PATTERN: Monotonic Stack", content: `// Next Greater Element (decreasing stack)
 vector<int> nge(n, -1);
 stack<int> st;  // stores indices
 for (int i = 0; i < n; i++) {
@@ -1169,7 +1169,7 @@ for (int i = 0; i < n; i++) {
 // INVARIANT: stack is always monotonic
 // DECREASING stack → next greater
 // INCREASING stack → next smaller
-// TIME: O(n) — each element pushed/popped once\` },
+// TIME: O(n) — each element pushed/popped once` },
     mistakes: [
       { wrong: "Storing values in stack instead of indices", correct: "Store indices in the stack, use arr[index] for comparisons", explanation: "Indices let you compute width (for histograms) and write results to the correct position. Values alone lose position information." },
       { wrong: "Using while (!st.empty() && arr[st.top()] >= arr[i])", correct: "Use strict < (not <=) for next greater, unless you want to skip equal elements", explanation: "Using >= pops equal elements too, meaning equal values won't have each other as NGE. This changes the semantics — be intentional about it." },
@@ -1191,8 +1191,8 @@ for (int i = 0; i < n; i++) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Sliding window maximum", "Sliding window minimum", "Deque operations", "Front-back maintenance"],
-    story: \`Imagine a **conveyor belt** moving items past an inspection window. You can only see 3 items at a time through the window. You want to know the **largest** item visible at each position. A naive approach re-examines all 3 items every time — O(n*k). But a **monotonic deque** maintains only the candidates for maximum, in decreasing order, giving O(n)!\n\nThe trick: when a new item arrives, remove all items from the back that are smaller — they can NEVER be the maximum while the new item is in the window. The front of the deque is always the current maximum. When the front slides out of the window, remove it. Each item enters and exits the deque at most once, so total work is O(n) despite the nested-looking while loop!\n\nThis pattern applies to sliding window min/max, and any problem where you need the extreme value in a moving window.\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine a **conveyor belt** moving items past an inspection window. You can only see 3 items at a time through the window. You want to know the **largest** item visible at each position. A naive approach re-examines all 3 items every time — O(n*k). But a **monotonic deque** maintains only the candidates for maximum, in decreasing order, giving O(n)!\n\nThe trick: when a new item arrives, remove all items from the back that are smaller — they can NEVER be the maximum while the new item is in the window. The front of the deque is always the current maximum. When the front slides out of the window, remove it. Each item enters and exits the deque at most once, so total work is O(n) despite the nested-looking while loop!\n\nThis pattern applies to sliding window min/max, and any problem where you need the extreme value in a moving window.`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │    MONOTONIC DEQUE — SLIDING WINDOW MAXIMUM              │
 │                                                          │
 │  Array:  [1,  3, -1, -3,  5,  3,  6,  7]  k=3          │
@@ -1211,7 +1211,7 @@ for (int i = 0; i < n; i++) {
 │                                                          │
 │  TIME: O(n) — each element added/removed once            │
 │  SPACE: O(k) — deque holds at most k elements            │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "deque<int> dq;  // stores indices", explanation: "Initialize empty deque (will hold indices, not values)", memoryChange: "Empty deque", output: "None" },
       { line: "for (int i = 0; i < n; i++) {", explanation: "Process each element as right edge of window", memoryChange: "No change", output: "None" },
@@ -1220,7 +1220,7 @@ for (int i = 0; i < n; i++) {
       { line: "  if (dq.front() <= i - k) dq.pop_front();", explanation: "Remove from front if index fell out of window", memoryChange: "Deque shrinks from front", output: "None" },
       { line: "  if (i >= k-1) result.push_back(arr[dq.front()]);", explanation: "Window fully formed — front of deque is the maximum", memoryChange: "Result updated", output: "Window max" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <deque>
 using namespace std;
@@ -1290,8 +1290,8 @@ int main() {
     vector<int> arr = {2, -1, 2};
     cout << "Shortest subarray sum>=3: " << shortestSubarray(arr, 3) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Monotonic Queue/Deque", content: \`// Sliding Window Maximum (decreasing deque)
+}`,
+    syntaxCard: { title: "PATTERN: Monotonic Queue/Deque", content: `// Sliding Window Maximum (decreasing deque)
 deque<int> dq;  // stores indices
 for (int i = 0; i < n; i++) {
     // 1. Remove smaller from back (they'll never be max)
@@ -1306,7 +1306,7 @@ for (int i = 0; i < n; i++) {
 
 // For MINIMUM: change < to > in step 1
 // TIME: O(n) — each index pushed/popped once
-// SPACE: O(k) — at most k elements in deque\` },
+// SPACE: O(k) — at most k elements in deque` },
     mistakes: [
       { wrong: "Using a regular queue or stack instead of deque", correct: "Use deque for O(1) push/pop from both ends", explanation: "You need to remove from both the front (out of window) and back (smaller elements). Only a deque supports both operations in O(1)." },
       { wrong: "Checking out-of-window before adding current element", correct: "Add current element first, then check if front is out of window", explanation: "The order matters: add current, then remove expired. If you remove expired first, you might remove an element that should be compared with the current one." },
@@ -1328,8 +1328,8 @@ for (int i = 0; i < n; i++) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Base case", "Recursive case", "Call stack visualization", "Recurrence relations"],
-    story: \`Imagine you're standing in a long line and want to know your position. You ask the person in front: "What's your position?" They ask the person in front of them, and so on, until someone at the front says "I'm position 1!" Then the answers ripple back: "I'm 2" → "I'm 3" → "I'm 4" — and finally you know you're 5th.\n\nThat's **recursion** — solving a problem by breaking it into a smaller version of the SAME problem, until you reach the **base case** (the simplest version you can answer directly). Every recursive function needs two things: (1) a **base case** that stops the recursion, and (2) a **recursive case** that makes progress toward the base case.\n\nThe magic: the function calls itself, and each call gets its own frame on the **call stack**. When a call returns, its result flows back to the caller. Without a base case, you get infinite recursion → stack overflow!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're standing in a long line and want to know your position. You ask the person in front: "What's your position?" They ask the person in front of them, and so on, until someone at the front says "I'm position 1!" Then the answers ripple back: "I'm 2" → "I'm 3" → "I'm 4" — and finally you know you're 5th.\n\nThat's **recursion** — solving a problem by breaking it into a smaller version of the SAME problem, until you reach the **base case** (the simplest version you can answer directly). Every recursive function needs two things: (1) a **base case** that stops the recursion, and (2) a **recursive case** that makes progress toward the base case.\n\nThe magic: the function calls itself, and each call gets its own frame on the **call stack**. When a call returns, its result flows back to the caller. Without a base case, you get infinite recursion → stack overflow!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │          RECURSION — CALL STACK UNWINDING                 │
 │                                                          │
 │  factorial(5) = 5 * factorial(4)                         │
@@ -1352,14 +1352,14 @@ for (int i = 0; i < n; i++) {
 │                                                          │
 │  KEY: Base case + progress toward it = valid recursion   │
 │  SPACE: O(depth) for call stack                          │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "int factorial(int n) {", explanation: "Define recursive function", memoryChange: "New stack frame created", output: "None" },
       { line: "  if (n <= 1) return 1;", explanation: "BASE CASE: simplest version, answer directly", memoryChange: "No recursive call", output: "1" },
       { line: "  return n * factorial(n - 1);", explanation: "RECURSIVE CASE: reduce problem, trust the recursive call", memoryChange: "New stack frame for factorial(n-1)", output: "n * (n-1)!" },
       { line: "}", explanation: "Stack frame destroyed, result returned to caller", memoryChange: "Stack frame popped", output: "Result propagated" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 using namespace std;
 
@@ -1424,8 +1424,8 @@ int main() {
     subsets(arr, 0, cur, subs);
     cout << "Subsets: " << subs.size() << endl;    // 8
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Recursion", content: \`// Template
+}`,
+    syntaxCard: { title: "PATTERN: Recursion", content: `// Template
 ReturnType solve(Input params) {
     if (base_case_condition) return base_case_answer;  // BASE
     return combine(solve(smaller_input));              // RECURSE
@@ -1442,7 +1442,7 @@ ReturnType solve(Input params) {
 // Divide: f(n) = ... f(n/2)          → O(log n) calls
 
 // SPACE: O(depth) for call stack
-// TAIL RECURSION: recursive call is last operation (can optimize)\` },
+// TAIL RECURSION: recursive call is last operation (can optimize)` },
     mistakes: [
       { wrong: "Forgetting the base case", correct: "Always define a base case that returns without recursion", explanation: "Without a base case, the function calls itself forever until the stack overflows. This is the #1 recursion mistake." },
       { wrong: "Not making progress toward the base case", correct: "Ensure each recursive call gets closer to the base case", explanation: "If you call factorial(n) without reducing n, it never reaches the base case. Always reduce the problem size." },
@@ -1464,8 +1464,8 @@ ReturnType solve(Input params) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Try-undo-retry", "Decision tree", "Pruning", "Permutations and combinations"],
-    story: \`Imagine you're exploring a **maze**. At each intersection, you pick a direction and walk. If you hit a dead end, you **backtrack** — retrace your steps to the last intersection and try a different path. You keep doing this until you find the exit or exhaust all paths.\n\nThat's **backtracking** — a systematic way to explore all possibilities by making a choice, recursing deeper, then **undoing** the choice (backtracking) to try alternatives. It's essentially a depth-first search through a **decision tree**.\n\nThe key insight: after the recursive call returns, you MUST undo your choice (pop from vector, unmark cell, restore state) so the next branch starts from the same state. Without this "undo" step, choices bleed into other branches! You can also **prune** — skip branches that can't possibly lead to a solution — dramatically reducing the search space.\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you're exploring a **maze**. At each intersection, you pick a direction and walk. If you hit a dead end, you **backtrack** — retrace your steps to the last intersection and try a different path. You keep doing this until you find the exit or exhaust all paths.\n\nThat's **backtracking** — a systematic way to explore all possibilities by making a choice, recursing deeper, then **undoing** the choice (backtracking) to try alternatives. It's essentially a depth-first search through a **decision tree**.\n\nThe key insight: after the recursive call returns, you MUST undo your choice (pop from vector, unmark cell, restore state) so the next branch starts from the same state. Without this "undo" step, choices bleed into other branches! You can also **prune** — skip branches that can't possibly lead to a solution — dramatically reducing the search space.`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │        BACKTRACKING — TRY, UNDO, TRY AGAIN               │
 │                                                          │
 │  Permutations of [1, 2, 3]:                              │
@@ -1489,7 +1489,7 @@ ReturnType solve(Input params) {
 │                                                          │
 │  TIME: O(n!) permutations, O(2^n) subsets               │
 │  SPACE: O(n) for recursion depth + current path          │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "void backtrack(vector<int>& nums, vector<int>& path, vector<bool>& used) {", explanation: "Recursive function with path and used-tracking state", memoryChange: "New stack frame", output: "None" },
       { line: "  if (path.size() == nums.size()) { result.push_back(path); return; }", explanation: "BASE CASE: complete permutation found", memoryChange: "Result saved", output: "None" },
@@ -1498,7 +1498,7 @@ ReturnType solve(Input params) {
       { line: "      path.push_back(nums[i]); used[i] = true;", explanation: "CHOOSE: add number to current path", memoryChange: "Path grows, used updated", output: "None" },
       { line: "      backtrack(nums, path, used);", explanation: "EXPLORE: recurse deeper with this choice", memoryChange: "Deeper recursion", output: "None" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <string>
 using namespace std;
@@ -1568,8 +1568,8 @@ int main() {
     solveNQueens(board, 0, 4, queens);
     cout << "4-Queens solutions: " << queens.size() << endl; // 2
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Backtracking", content: \`// Template: Choose → Explore → Undo
+}`,
+    syntaxCard: { title: "PATTERN: Backtracking", content: `// Template: Choose → Explore → Undo
 void backtrack(state) {
     if (COMPLETE) { save result; return; }
     for (each choice) {
@@ -1590,7 +1590,7 @@ void backtrack(state) {
 // With pruning: skip dead ends early
 
 // TIME: varies (O(n!), O(2^n), etc.)
-// SPACE: O(n) for recursion + path\` },
+// SPACE: O(n) for recursion + path` },
     mistakes: [
       { wrong: "Forgetting to undo the choice after recursive call", correct: "Always undo (pop, unmark, restore) after the recursive call returns", explanation: "Without the undo step, the choice persists into sibling branches. The path/vector accumulates all choices instead of exploring alternatives independently." },
       { wrong: "Not pruning invalid branches", correct: "Add conditions to skip branches that can't lead to valid solutions", explanation: "Without pruning, backtracking explores every possibility, even obviously invalid ones. This causes TLE on larger inputs. Pruning can reduce runtime exponentially." },
@@ -1612,8 +1612,8 @@ void backtrack(state) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Split problem", "Solve subproblems", "Merge results", "Master theorem"],
-    story: \`Imagine you need to count the number of people in a **stadium**. Instead of counting everyone yourself (O(n)), you split the stadium into two halves and ask two assistants to count each half. They each split their half into two quarters and delegate further. When each section has just one person, they report "1!" The counts bubble back up: sections → quarters → halves → total.\n\nThat's **Divide & Conquer**: (1) **Divide** the problem into smaller subproblems, (2) **Conquer** each subproblem recursively, (3) **Merge** the solutions into the final answer.\n\nThis pattern powers merge sort (split array in half, sort each, merge), quick sort (partition around pivot, sort each side), binary search (split in half, search one side), and more. The **Master Theorem** tells you the complexity: T(n) = aT(n/b) + O(n^d). If d < log_b(a), the recursive work dominates. If d = log_b(a), they balance. If d > log_b(a), the merge work dominates.\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you need to count the number of people in a **stadium**. Instead of counting everyone yourself (O(n)), you split the stadium into two halves and ask two assistants to count each half. They each split their half into two quarters and delegate further. When each section has just one person, they report "1!" The counts bubble back up: sections → quarters → halves → total.\n\nThat's **Divide & Conquer**: (1) **Divide** the problem into smaller subproblems, (2) **Conquer** each subproblem recursively, (3) **Merge** the solutions into the final answer.\n\nThis pattern powers merge sort (split array in half, sort each, merge), quick sort (partition around pivot, sort each side), binary search (split in half, search one side), and more. The **Master Theorem** tells you the complexity: T(n) = aT(n/b) + O(n^d). If d < log_b(a), the recursive work dominates. If d = log_b(a), they balance. If d > log_b(a), the merge work dominates.`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │      DIVIDE & CONQUER — SPLIT, SOLVE, MERGE              │
 │                                                          │
 │  Merge Sort on [38, 27, 43, 3, 9, 82, 10]:              │
@@ -1633,7 +1633,7 @@ void backtrack(state) {
 │                                                          │
 │  T(n) = 2T(n/2) + O(n) → O(n log n) by Master Thm      │
 │  SPACE: O(n) for merge buffer                            │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "if (lo >= hi) return;  // base case: single element", explanation: "A single element is already sorted — base case", memoryChange: "No change", output: "None" },
       { line: "int mid = lo + (hi - lo) / 2;", explanation: "DIVIDE: find the middle point", memoryChange: "mid computed", output: "None" },
@@ -1641,7 +1641,7 @@ void backtrack(state) {
       { line: "mergeSort(arr, mid + 1, hi);", explanation: "CONQUER right half recursively", memoryChange: "Right half sorted on stack", output: "None" },
       { line: "merge(arr, lo, mid, hi);", explanation: "MERGE: combine two sorted halves into one sorted array", memoryChange: "Elements rearranged into sorted order", output: "Sorted subarray" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <climits>
@@ -1714,8 +1714,8 @@ int main() {
     vector<int> inv = {5, 3, 2, 4, 1};
     cout << "Inversions: " << countInversions(inv, 0, inv.size()-1) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Divide & Conquer", content: \`// Template
+}`,
+    syntaxCard: { title: "PATTERN: Divide & Conquer", content: `// Template
 ReturnType solve(Input, lo, hi) {
     if (base_case) return base_answer;   // CONQUER base
     int mid = lo + (hi - lo) / 2;        // DIVIDE
@@ -1732,7 +1732,7 @@ ReturnType solve(Input, lo, hi) {
 // Examples:
 // Merge Sort: 2T(n/2)+O(n) → O(n log n)
 // Binary Search: 1T(n/2)+O(1) → O(log n)
-// Strassen: 7T(n/2)+O(n^2) → O(n^2.81)\` },
+// Strassen: 7T(n/2)+O(n^2) → O(n^2.81)` },
     mistakes: [
       { wrong: "Not handling the merge step correctly", correct: "Merge must combine results from subproblems properly", explanation: "The merge step is where most bugs happen. In merge sort, you must compare and place elements in order. In max subarray D&C, you must handle the cross-midpoint case." },
       { wrong: "Using int mid = (lo + hi) / 2 in D&C", correct: "int mid = lo + (hi - lo) / 2", explanation: "lo + hi can overflow for large indices. The alternative avoids overflow while computing the same result." },
@@ -1754,8 +1754,8 @@ ReturnType solve(Input, lo, hi) {
     phaseId: "phase-4",
     phaseTitle: "Problem Solving Patterns",
     subtopics: ["Split problem in half", "Combine two halves", "Reduce 2^n to 2^(n/2)", "Subset sum variants"],
-    story: \`Imagine you need to find two people in a **crowd of 40** whose combined heights equal exactly 12 feet. Checking all pairs would be 40×39/2 = 780 combinations — manageable. But what if it's **40 items** and you need to find a subset summing to a target? That's 2^40 ≈ 1 trillion subsets — impossible!\n\n**Meet in the Middle** cuts this in half. Split the 40 items into two groups of 20. Generate all 2^20 ≈ 1 million subset sums for each group (feasible!). Then for each sum in group A, check if (target - sum) exists in group B using binary search or a hash set. Instead of 2^40, you do 2^20 + 2^20 + lookups — dramatically faster!\n\nThe pattern: when brute force on the full problem is too expensive (2^n or n^n), split the input in half, solve each half independently, and combine. It turns O(2^n) into O(2^(n/2)) — an exponential speedup!\`,
-    memoryViz: \`┌──────────────────────────────────────────────────────────┐
+    story: `**Imagine you need to find two people in a **crowd of 40** whose combined heights equal exactly 12 feet. Checking all pairs would be 40×39/2 = 780 combinations — manageable. But what if it's **40 items** and you need to find a subset summing to a target? That's 2^40 ≈ 1 trillion subsets — impossible!\n\n**Meet in the Middle** cuts this in half. Split the 40 items into two groups of 20. Generate all 2^20 ≈ 1 million subset sums for each group (feasible!). Then for each sum in group A, check if (target - sum) exists in group B using binary search or a hash set. Instead of 2^40, you do 2^20 + 2^20 + lookups — dramatically faster!\n\nThe pattern: when brute force on the full problem is too expensive (2^n or n^n), split the input in half, solve each half independently, and combine. It turns O(2^n) into O(2^(n/2)) — an exponential speedup!`,
+    memoryViz: `┌──────────────────────────────────────────────────────────┐
 │     MEET IN THE MIDDLE — SPLIT, SOLVE, COMBINE           │
 │                                                          │
 │  Problem: Subset of [a1..a40] summing to target T        │
@@ -1781,7 +1781,7 @@ ReturnType solve(Input, lo, hi) {
 │  TIME: O(2^(n/2) * n) instead of O(2^n)                 │
 │  SPACE: O(2^(n/2)) for storing half-subsets              │
 │  SPEEDUP: 2^40 → 2^20 ≈ 10^12 → 10^6                   │
-└──────────────────────────────────────────────────────────┘\`,
+└──────────────────────────────────────────────────────────┘`,
     stepByStep: [
       { line: "int mid = n / 2;", explanation: "Split array into two halves at midpoint", memoryChange: "mid computed", output: "None" },
       { line: "vector<long long> leftSums = generateSubsets(arr, 0, mid);", explanation: "Generate all 2^(n/2) subset sums for left half", memoryChange: "leftSums has 2^mid elements", output: "None" },
@@ -1789,7 +1789,7 @@ ReturnType solve(Input, lo, hi) {
       { line: "sort(rightSums.begin(), rightSums.end());", explanation: "Sort right sums for binary search", memoryChange: "rightSums sorted", output: "None" },
       { line: "for (auto s : leftSums) { auto it = lower_bound(rightSums, target - s); }", explanation: "For each left sum, find complement in right sums using binary search", memoryChange: "No change", output: "Found or not" },
     ],
-    code: \`#include <iostream>
+    code: `#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <cmath>
@@ -1867,8 +1867,8 @@ int main() {
     cout << "Closest to 97: " << closestSubsetSum(arr, 97) << endl;
     cout << "Subsets sum<=10: " << countSubsets(arr, 10) << endl;
     return 0;
-}\`,
-    syntaxCard: { title: "PATTERN: Meet in the Middle", content: \`// Template: Split, Solve halves, Combine
+}`,
+    syntaxCard: { title: "PATTERN: Meet in the Middle", content: `// Template: Split, Solve halves, Combine
 1. Split input into two halves (mid = n/2)
 2. Generate all solutions for left half  → vector L
 3. Generate all solutions for right half → vector R
@@ -1884,7 +1884,7 @@ int main() {
 // vs brute: O(2^n) — exponential speedup!
 
 // WHEN TO USE: n ≈ 40 (2^20 is fine, 2^40 is not)
-// SPACE: O(2^(n/2)) for storing half-subsets\` },
+// SPACE: O(2^(n/2)) for storing half-subsets` },
     mistakes: [
       { wrong: "Using meet-in-the-middle when n is small", correct: "Use brute force for n ≤ 20; meet-in-the-middle for n ≈ 40", explanation: "For small n, brute force is simpler and fast enough. Meet-in-the-middle adds complexity that's unnecessary when 2^n is already manageable." },
       { wrong: "Forgetting to sort one of the halves before binary search", correct: "Sort one side before searching for complements", explanation: "Binary search requires sorted input. You must sort one of the generated lists before searching." },

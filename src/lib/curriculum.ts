@@ -1598,7 +1598,7 @@ public:
 import { phase1Remaining } from './curriculum-phase1-remaining';
 import { phase2Content } from './curriculum-phase2';
 import { phase3Content } from './curriculum-phase3';
-import { phase4Content } from './curriculum-phase4';
+import { phase4Content } from './curriculum-phase4-new';
 import { phase5Content, phase6Content } from './curriculum-phase5-6';
 import { phase7Content, phase8Content } from './curriculum-phase7-8';
 
