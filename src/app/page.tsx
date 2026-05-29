@@ -7,7 +7,7 @@ import {
   ChevronRight, ChevronLeft, Menu, X, Terminal, Cpu, Zap,
   BookMarked, GraduationCap, Search, ArrowRight, RotateCcw,
   Lightbulb, Eye, Play, Copy, Check, ChevronDown, Star,
-  Progress, MessageSquare, Command, Sparkles, Layers
+  MessageSquare, Command, Sparkles, Layers
 } from 'lucide-react';
 import { phases, getTopic, getNextTopic, getPrevTopic, type Topic } from '@/lib/curriculum';
 import { useLearningStore } from '@/lib/learning-store';
