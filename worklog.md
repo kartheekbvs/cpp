@@ -1,22 +1,29 @@
 ---
 Task ID: 1
-Agent: Main Agent
-Task: Build C++ Learning Platform - Interactive Web Application
+Agent: Main
+Task: Implement collapsible sidebar navigation and side-by-side code+compiler layout
 
 Work Log:
-- Initialized Next.js 16 fullstack development environment
-- Created comprehensive curriculum data structure with 8 phases, 91 topics
-- Built detailed content for 7 Phase 1 topics (1.1-1.7) with all 8 teaching rules
-- Created Zustand learning store with progress tracking and persistence
-- Built main page with sidebar navigation and lesson viewer
-- Implemented 8 lesson sections: Story, Memory Viz, Step-by-Step, Code, Syntax Card, Mistakes, LeetCode, Checkpoint
-- Added interactive features: checkpoint quizzes, command input, auto-play steps
-- Styled with dark theme, emerald accent, responsive design
-- Verified lint passes and dev server runs successfully
+- Read current page.tsx layout structure (1197 lines)
+- Analyzed Home component, Sidebar, LessonViewer, CppCompiler, and all sections
+- Updated CppCompiler: redesigned from vertical stacked layout to split-pane (code left, output right)
+- Added `compact` prop to CppCompiler for Mistakes section (vertical layout for small areas)
+- Added layout toggle button (Columns2 icon) to switch between side-by-side and stacked views
+- Updated CodeSection: removed separate CodeBlock + CppCompiler, now uses just the split-pane CppCompiler
+- Updated LeetcodeSection: replaced CodeBlock + separate CppCompiler with integrated CppCompiler
+- Updated MistakesSection: uses compact CppCompiler
+- Made sidebar collapsible on ALL screen sizes (was only mobile before)
+- Added thin sidebar rail (PanelLeftOpen icon) on desktop when sidebar is closed
+- Updated header toggle button to show PanelLeftClose when open, Menu when closed
+- Removed `lg:hidden` from sidebar close button (X) so it works on all screens
+- Widened content area from max-w-4xl to max-w-5xl
+- Added new lucide icons: PanelLeftClose, PanelLeftOpen, Columns2
+- Build succeeds cleanly
+- Browser testing confirms: sidebar toggle works, split-pane compiler works, Godbolt API compilation works (35ms)
 
 Stage Summary:
-- Complete interactive C++ learning platform running at localhost:3000
-- 7 fully detailed topics with stories, memory diagrams, code, syntax cards, mistakes, leetcode problems, and checkpoint quizzes
-- All 8 phases and 91 topics listed in sidebar navigation
-- Progress tracking persists in localStorage
-- Responsive design with mobile sidebar support
+- Sidebar is now fully collapsible on desktop AND mobile with smooth animation
+- Code section has a split-pane IDE layout: code editor on left, output panel on right
+- Compiler toolbar has: Run, Stdin, Reset, Copy, Layout Toggle, External Link
+- Compact mode used in Mistakes section for space efficiency
+- Production build compiles successfully

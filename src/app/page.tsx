@@ -7,7 +7,7 @@ import {
   BookMarked, GraduationCap, Search, ArrowRight, RotateCcw,
   Lightbulb, Eye, Play, Copy, Check, ChevronDown, Star,
   MessageSquare, Command, Sparkles, Layers, Loader2, ExternalLink,
-  Square, Maximize2, Minimize2
+  Square, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, Columns2
 } from 'lucide-react';
 import { phases, getTopic, getNextTopic, getPrevTopic, type Topic } from '@/lib/curriculum';
 import { useLearningStore } from '@/lib/learning-store';
@@ -62,7 +62,7 @@ function Sidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="ml-auto lg:hidden text-slate-400 hover:text-white"
+            className="ml-auto text-slate-400 hover:text-white"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -211,14 +211,14 @@ interface CompilerResult {
   timedOut: boolean;
 }
 
-function CppCompiler({ initialCode }: { initialCode: string }) {
+function CppCompiler({ initialCode, compact = false }: { initialCode: string; compact?: boolean }) {
   const [code, setCode] = useState(initialCode);
   const [stdin, setStdin] = useState('');
   const [output, setOutput] = useState<CompilerResult | null>(null);
   const [isCompiling, setIsCompiling] = useState(false);
   const [showStdin, setShowStdin] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'output' | 'errors'>('output');
+  const [isHorizontal, setIsHorizontal] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Strip ANSI escape codes from compiler output
@@ -239,7 +239,6 @@ function CppCompiler({ initialCode }: { initialCode: string }) {
       const end = target.selectionEnd;
       const newValue = code.substring(0, start) + '    ' + code.substring(end);
       setCode(newValue);
-      // Set cursor position after the inserted tab
       setTimeout(() => {
         target.selectionStart = target.selectionEnd = start + 4;
       }, 0);
@@ -249,90 +248,232 @@ function CppCompiler({ initialCode }: { initialCode: string }) {
   const compileAndRun = useCallback(async () => {
     setIsCompiling(true);
     setOutput(null);
-
     try {
       const response = await fetch('https://godbolt.org/api/compiler/g132/compile', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           source: code,
           options: {
             userArguments: '-std=c++17 -O2',
-            compilerOptions: {
-              executorRequest: true,
-            },
-            filters: {
-              execute: true,
-            },
-            tools: [],
-            libraries: [],
+            compilerOptions: { executorRequest: true },
+            filters: { execute: true },
+            tools: [], libraries: [],
           },
           lang: 'c++',
           allowStoreCodeDebug: true,
           ...(stdin.trim() ? { executeParameters: { args: [], stdin: stdin } } : {}),
         }),
       });
-
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}: ${response.statusText}`);
-      }
-
+      if (!response.ok) throw new Error(`API returned ${response.status}: ${response.statusText}`);
       const data = await response.json();
-
       const stdoutText = (data.stdout || []).map((line: { text: string }) => line.text).join('\n');
       const stderrText = (data.stderr || []).map((line: { text: string }) => stripAnsi(line.text)).join('\n');
       const buildStderr = data.buildResult?.stderr?.map((line: { text: string }) => stripAnsi(line.text)).join('\n') || '';
-
       const result: CompilerResult = {
         stdout: stdoutText,
         stderr: buildStderr + (buildStderr && stderrText ? '\n' : '') + stderrText,
-        code: data.code ?? -1,
-        execTime: data.execTime ?? 0,
-        didExecute: data.didExecute ?? false,
-        timedOut: data.timedOut ?? false,
+        code: data.code ?? -1, execTime: data.execTime ?? 0,
+        didExecute: data.didExecute ?? false, timedOut: data.timedOut ?? false,
       };
-
       setOutput(result);
       setActiveTab(result.stderr ? 'errors' : 'output');
     } catch (err: any) {
       setOutput({
         stdout: '',
-        stderr: `Compilation failed: ${err.message || 'Unknown error'}.\n\nPlease check your internet connection. The compiler requires access to godbolt.org API.`,
-        code: -1,
-        execTime: 0,
-        didExecute: false,
-        timedOut: false,
+        stderr: `Compilation failed: ${err.message || 'Unknown error'}.\n\nPlease check your internet connection.`,
+        code: -1, execTime: 0, didExecute: false, timedOut: false,
       });
       setActiveTab('errors');
-    } finally {
-      setIsCompiling(false);
-    }
-  }, [code]);
+    } finally { setIsCompiling(false); }
+  }, [code, stdin]);
 
   const hasErrors = output && output.stderr && output.stderr.trim().length > 0;
   const hasOutput = output && output.stdout && output.stdout.trim().length > 0;
 
+  // Output panel content (shared between split and stacked)
+  const outputPanel = (
+    <div className="flex flex-col h-full min-h-0">
+      {/* Output Tabs */}
+      <div className="flex items-center shrink-0 border-b border-slate-700/30 bg-slate-900/40">
+        <button
+          onClick={() => setActiveTab('output')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeTab === 'output'
+              ? 'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Terminal className="w-3 h-3" />
+          Output
+          {hasOutput && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+        </button>
+        <button
+          onClick={() => setActiveTab('errors')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
+            activeTab === 'errors'
+              ? 'text-red-400 border-b-2 border-red-400 bg-red-500/5'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <AlertTriangle className="w-3 h-3" />
+          Errors
+          {hasErrors && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
+        </button>
+        <div className="ml-auto pr-2 flex items-center gap-2">
+          {output && output.didExecute && output.code === 0 && !hasErrors && (
+            <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> OK
+            </span>
+          )}
+          {output && output.didExecute && output.code !== 0 && (
+            <span className="text-xs font-medium text-red-400 flex items-center gap-1">
+              <X className="w-3 h-3" /> Exit: {output.code}
+            </span>
+          )}
+          {output && output.execTime > 0 && (
+            <span className="text-xs text-slate-500">{output.execTime}ms</span>
+          )}
+        </div>
+      </div>
+      {/* Output Content */}
+      <div className="flex-1 p-3 bg-slate-950 overflow-y-auto min-h-0">
+        {output ? (
+          <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
+            {activeTab === 'output' ? (
+              hasOutput ? (
+                <span className="text-emerald-300">{output.stdout}</span>
+              ) : !hasErrors ? (
+                <span className="text-slate-500 italic">No output.</span>
+              ) : (
+                <span className="text-slate-500 italic">No output — check Errors tab.</span>
+              )
+            ) : (
+              hasErrors ? (
+                <span className="text-red-300">{output.stderr}</span>
+              ) : (
+                <span className="text-emerald-400 italic">No errors! Compiled successfully.</span>
+              )
+            )}
+          </pre>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-2">
+            <Terminal className="w-8 h-8" />
+            <span className="text-sm">Click Run to see output</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Stdin section
+  const stdinSection = showStdin && (
+    <div className="px-3 py-2 border-t border-slate-700/30 bg-slate-950/50">
+      <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 block">
+        Stdin
+      </label>
+      <textarea
+        value={stdin}
+        onChange={(e) => setStdin(e.target.value)}
+        spellCheck={false}
+        placeholder="Program input..."
+        className="w-full h-14 p-2 bg-slate-900 border border-slate-700/50 rounded-lg text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/30 resize-none"
+      />
+    </div>
+  );
+
+  // Compact mode for Mistakes section (vertical, no split)
+  if (compact) {
+    return (
+      <div className="rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-2 bg-slate-800/80 border-b border-sky-500/30">
+          <div className="flex items-center gap-2">
+            <Terminal className="w-3.5 h-3.5 text-sky-400" />
+            <span className="text-xs font-bold text-sky-300 uppercase tracking-wider">Compiler</span>
+            <span className="text-xs text-slate-500">gcc 13.2 • C++17</span>
+          </div>
+        </div>
+        {/* Code Editor */}
+        <textarea
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          onKeyDown={handleKeyDown}
+          spellCheck={false}
+          className="w-full min-h-[160px] max-h-[300px] p-3 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600"
+          placeholder="Type your C++ code here..."
+        />
+        {/* Controls */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-slate-900/60 border-t border-slate-700/30">
+          <Button size="sm" className={`text-white font-semibold gap-1.5 ${isCompiling ? 'bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'}`} onClick={compileAndRun} disabled={isCompiling}>
+            {isCompiling ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Compiling...</> : <><Play className="w-3.5 h-3.5" /> Run</>}
+          </Button>
+          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white gap-1" onClick={() => setShowStdin(!showStdin)}>
+            <Terminal className="w-3 h-3" /> Stdin
+          </Button>
+          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white gap-1" onClick={() => { setCode(initialCode); setOutput(null); }} title="Reset">
+            <RotateCcw className="w-3 h-3" />
+          </Button>
+          <a href="https://cpp.sh/" target="_blank" rel="noopener noreferrer" className="ml-auto flex items-center gap-1 px-2 py-1 text-xs text-slate-400 hover:text-sky-300 rounded hover:bg-slate-800/60">
+            <ExternalLink className="w-3 h-3" /> cpp.sh
+          </a>
+        </div>
+        {stdinSection}
+        {/* Output */}
+        {output && (
+          <div className="border-t border-slate-700/30 max-h-[200px] overflow-y-auto">
+            {outputPanel}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Full split-pane compiler for Code/LeetCode sections
   return (
-    <div className={`rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden transition-all ${isExpanded ? 'col-span-2' : ''}`}>
-      {/* Compiler Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 border-b border-sky-500/30">
+    <div className="rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden">
+      {/* Compiler Header + Controls */}
+      <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 border-b border-sky-500/30 flex-wrap">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-sky-400" />
           <span className="text-xs font-bold text-sky-300 uppercase tracking-wider">C++ Compiler</span>
-          <span className="text-xs text-slate-500 ml-1">gcc 13.2 • C++17</span>
+          <span className="text-xs text-slate-500">gcc 13.2 • C++17</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 ml-auto">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-slate-400 hover:text-white"
-            onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? 'Collapse' : 'Expand'}
+            size="sm"
+            className={`h-7 px-2 text-slate-400 hover:text-white gap-1 ${showStdin ? 'text-sky-300' : ''}`}
+            onClick={() => setShowStdin(!showStdin)}
           >
-            {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <Terminal className="w-3 h-3" /> Stdin
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-slate-400 hover:text-white gap-1"
+            onClick={() => { setCode(initialCode); setOutput(null); }}
+            title="Reset code to original"
+          >
+            <RotateCcw className="w-3 h-3" /> Reset
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-slate-400 hover:text-white gap-1"
+            onClick={() => { navigator.clipboard.writeText(code); }}
+            title="Copy code"
+          >
+            <Copy className="w-3 h-3" /> Copy
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-slate-400 hover:text-white"
+            onClick={() => setIsHorizontal(!isHorizontal)}
+            title={isHorizontal ? 'Stack vertically' : 'Side by side'}
+          >
+            <Columns2 className="w-3.5 h-3.5" />
           </Button>
           <a
             href="https://godbolt.org/"
@@ -341,187 +482,44 @@ function CppCompiler({ initialCode }: { initialCode: string }) {
             className="h-7 w-7 inline-flex items-center justify-center text-slate-400 hover:text-white rounded-md hover:bg-slate-700/50 transition-colors"
             title="Open Compiler Explorer"
           >
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-3 h-3" />
           </a>
-        </div>
-      </div>
-
-      {/* Code Editor */}
-      <div className="relative">
-        <textarea
-          ref={textareaRef}
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          className="w-full min-h-[200px] max-h-[400px] p-4 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600"
-          placeholder="Type your C++ code here..."
-        />
-        {/* Line count indicator */}
-        <div className="absolute bottom-2 right-3 text-xs text-slate-600 pointer-events-none">
-          {code.split('\n').length} lines
-        </div>
-      </div>
-
-      {/* Controls Bar */}
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-900/60 border-t border-slate-700/30">
-        <Button
-          size="sm"
-          className={`text-white font-semibold gap-2 ${isCompiling ? 'bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
-          onClick={compileAndRun}
-          disabled={isCompiling}
-        >
-          {isCompiling ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Compiling...
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              Run Code
-            </>
-          )}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-slate-400 hover:text-white gap-1.5"
-          onClick={() => setShowStdin(!showStdin)}
-        >
-          <Terminal className="w-3.5 h-3.5" />
-          Stdin {showStdin ? '▲' : '▼'}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-slate-400 hover:text-white gap-1.5"
-          onClick={() => { setCode(initialCode); setOutput(null); }}
-          title="Reset code to original"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Reset
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-slate-400 hover:text-white gap-1.5"
-          onClick={() => { navigator.clipboard.writeText(code); }}
-          title="Copy code"
-        >
-          <Copy className="w-3.5 h-3.5" />
-          Copy
-        </Button>
-
-        <a
-          href="https://cpp.sh/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-slate-400 hover:text-sky-300 rounded-md hover:bg-slate-800/60 transition-colors ml-auto"
-        >
-          <ExternalLink className="w-3 h-3" />
-          cpp.sh
-        </a>
-
-        {/* Stdin toggle */}
-        {output && output.execTime > 0 && (
-          <span className="text-xs text-slate-500 ml-auto">
-            Executed in {output.execTime}ms
-          </span>
-        )}
-      </div>
-
-      {/* Stdin Input (collapsible) */}
-      {showStdin && (
-        <div className="px-4 py-2 border-t border-slate-700/30 bg-slate-950/50">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 block">
-            Standard Input (stdin)
-          </label>
-          <textarea
-            value={stdin}
-            onChange={(e) => setStdin(e.target.value)}
-            spellCheck={false}
-            placeholder="Enter input for your program (one value per line)..."
-            className="w-full h-16 p-2 bg-slate-900 border border-slate-700/50 rounded-lg text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500/30 resize-none"
-          />
-        </div>
-      )}
-
-      {/* Output Panel */}
-      {output && (
-        <div className="border-t border-slate-700/30">
-          {/* Output Tabs */}
-          <div className="flex items-center border-b border-slate-700/30 bg-slate-900/40">
-            <button
-              onClick={() => setActiveTab('output')}
-              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium transition-colors ${
-                activeTab === 'output'
-                  ? 'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Terminal className="w-3.5 h-3.5" />
-              Output
-              {hasOutput && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
-            </button>
-            <button
-              onClick={() => setActiveTab('errors')}
-              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-medium transition-colors ${
-                activeTab === 'errors'
-                  ? 'text-red-400 border-b-2 border-red-400 bg-red-500/5'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Compiler Messages
-              {hasErrors && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
-            </button>
-            <div className="ml-auto pr-3 flex items-center gap-2">
-              {output.didExecute && output.code === 0 && !hasErrors && (
-                <span className="text-xs font-medium text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> Success
-                </span>
-              )}
-              {output.didExecute && output.code !== 0 && (
-                <span className="text-xs font-medium text-red-400 flex items-center gap-1">
-                  <X className="w-3 h-3" /> Exit code: {output.code}
-                </span>
-              )}
-              {output.timedOut && (
-                <span className="text-xs font-medium text-amber-400 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" /> Timed Out
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Output Content */}
-          <div className="p-4 bg-slate-950 max-h-[300px] overflow-y-auto">
-            {activeTab === 'output' ? (
-              <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
-                {hasOutput ? (
-                  <span className="text-emerald-300">{output.stdout}</span>
-                ) : !hasErrors ? (
-                  <span className="text-slate-500 italic">Program executed with no output.</span>
-                ) : (
-                  <span className="text-slate-500 italic">No output — check Compiler Messages tab for errors.</span>
-                )}
-              </pre>
+          <Button
+            size="sm"
+            className={`text-white font-semibold gap-1.5 ml-1 ${isCompiling ? 'bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+            onClick={compileAndRun}
+            disabled={isCompiling}
+          >
+            {isCompiling ? (
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Compiling...</>
             ) : (
-              <pre className="text-sm font-mono leading-relaxed whitespace-pre-wrap">
-                {hasErrors ? (
-                  <span className="text-red-300">{output.stderr}</span>
-                ) : (
-                  <span className="text-emerald-400 italic">No errors or warnings! Code compiled successfully.</span>
-                )}
-              </pre>
+              <><Play className="w-3.5 h-3.5" /> Run</>
             )}
-          </div>
+          </Button>
         </div>
-      )}
+      </div>
+
+      {/* Split Pane: Editor + Output */}
+      <div className={`flex ${isHorizontal ? 'flex-row' : 'flex-col'} min-h-[400px] max-h-[600px]`}>
+        {/* Left: Code Editor */}
+        <div className={`flex flex-col min-h-0 ${isHorizontal ? 'w-1/2 border-r border-slate-700/30' : 'border-b border-slate-700/30'}`}>
+          <textarea
+            ref={textareaRef}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            onKeyDown={handleKeyDown}
+            spellCheck={false}
+            className="flex-1 w-full p-3 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600 min-h-0"
+            placeholder="Type your C++ code here..."
+          />
+          {stdinSection}
+        </div>
+
+        {/* Right: Output */}
+        <div className={`flex flex-col min-h-0 ${isHorizontal ? 'w-1/2' : ''}`}>
+          {outputPanel}
+        </div>
+      </div>
     </div>
   );
 }
@@ -684,20 +682,11 @@ function CodeSection({ topic }: { topic: Topic }) {
         </div>
         <div>
           <h2 className="text-xl font-bold text-white">Complete Working Code</h2>
-          <p className="text-sm text-slate-400">Every line commented for beginners — hit Run to execute!</p>
+          <p className="text-sm text-slate-400">Edit &amp; run the code live — side by side!</p>
         </div>
       </div>
-      <CodeBlock code={topic.code} title={`${topic.title} — Full Example`} />
-
-      {/* Built-in Compiler */}
-      <div className="mt-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap className="w-5 h-5 text-emerald-400" />
-          <h3 className="text-lg font-bold text-white">Run It Live</h3>
-          <span className="text-xs text-slate-500 ml-1">Edit the code and click Run</span>
-        </div>
-        <CppCompiler initialCode={topic.code} />
-      </div>
+      {/* Split IDE: Code + Compiler integrated */}
+      <CppCompiler initialCode={topic.code} />
     </ContentSection>
   );
 }
@@ -762,7 +751,7 @@ function MistakesSection({ topic }: { topic: Topic }) {
             <CodeBlock code={mistake.correct} title="Correct Code" />
             {/* Run Correct Code */}
             <div className="mt-2">
-              <CppCompiler initialCode={mistake.correct} />
+              <CppCompiler initialCode={mistake.correct} compact />
             </div>
           </CardContent>
         </Card>
@@ -826,18 +815,8 @@ function LeetcodeSection({ topic }: { topic: Topic }) {
         </CardContent>
       </Card>
 
-      {/* Solution Code */}
-      <CodeBlock code={topic.leetcode.code} title="Solution Code" />
-
-      {/* Run LeetCode Solution */}
-      <div className="mt-2">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap className="w-5 h-5 text-orange-400" />
-          <h3 className="text-lg font-bold text-white">Test the Solution</h3>
-          <span className="text-xs text-slate-500 ml-1">Edit and run the solution code</span>
-        </div>
-        <CppCompiler initialCode={topic.leetcode.code} />
-      </div>
+      {/* Solution Code — Integrated Compiler */}
+      <CppCompiler initialCode={topic.leetcode.code} />
 
       {/* Complexity */}
       <Card className="bg-slate-900/80 border-violet-500/30">
@@ -1089,7 +1068,7 @@ function LessonViewer() {
 
       {/* Lesson Content */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="px-6 py-6 max-w-4xl">
+        <div className="px-6 py-6 max-w-5xl">
           {activeSection === 'story' && <StorySection key="story" topic={topic} />}
           {activeSection === 'memory' && <MemorySection key="memory" topic={topic} />}
           {activeSection === 'steps' && <StepsSection key="steps" topic={topic} />}
@@ -1145,20 +1124,35 @@ export default function Home() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — collapsible on ALL screens */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-300 lg:relative lg:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed lg:relative inset-y-0 left-0 z-50 w-72 transform transition-all duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:-translate-x-full lg:w-0 lg:overflow-hidden'}
       `}>
         <Sidebar />
       </aside>
+
+      {/* Collapsed sidebar rail — always visible thin strip on desktop to re-open */}
+      {!sidebarOpen && (
+        <div
+          className="hidden lg:flex flex-col items-center py-4 w-10 bg-slate-900/80 border-r border-slate-700/50 cursor-pointer hover:bg-slate-800 transition-colors shrink-0"
+          onClick={toggleSidebar}
+        >
+          <PanelLeftOpen className="w-4 h-4 text-slate-400 hover:text-emerald-400 transition-colors" />
+          <div className="mt-3 flex flex-col gap-2">
+            <div className="w-1 h-1 rounded-full bg-emerald-500/60" />
+            <div className="w-1 h-1 rounded-full bg-emerald-500/40" />
+            <div className="w-1 h-1 rounded-full bg-emerald-500/20" />
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
         <header className="flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 border-b border-slate-700/50">
-          <Button variant="ghost" size="icon" className="lg:hidden text-slate-400 hover:text-white" onClick={toggleSidebar}>
-            <Menu className="w-5 h-5" />
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white" onClick={toggleSidebar} title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}>
+            {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
           <div className="flex items-center gap-2">
             <GraduationCap className="w-5 h-5 text-emerald-400" />
