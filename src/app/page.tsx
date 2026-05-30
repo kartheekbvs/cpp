@@ -477,7 +477,7 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
 
   // Full compiler for Code/LeetCode sections — responsive with mobile-first design
   return (
-    <div ref={compilerRef} className={`rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden flex flex-col ${isFullscreen ? 'fixed inset-2 z-[100] rounded-xl' : ''}`}>
+    <div ref={compilerRef} className={`rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden flex flex-col min-h-[420px] md:min-h-[560px] ${isFullscreen ? 'fixed inset-2 z-[100] rounded-xl' : ''}`}>
       {/* Compiler Header + Controls */}
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 border-b border-sky-500/30 flex-wrap">
         <div className="flex items-center gap-2">
@@ -789,9 +789,7 @@ function CodeSection({ topic }: { topic: Topic }) {
         </div>
       </div>
       {/* Split IDE: Code + Compiler integrated */}
-      <div className="min-h-[420px] md:min-h-[500px]">
-        <CppCompiler initialCode={topic.code} />
-      </div>
+      <CppCompiler initialCode={topic.code} />
     </ContentSection>
   );
 }
