@@ -170,18 +170,18 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
   };
 
   return (
-    <div className="rounded-xl overflow-hidden border border-slate-700/50 bg-slate-950 shadow-xl">
+    <div className="rounded-xl overflow-hidden border border-slate-600/50 bg-slate-950 shadow-xl">
       {title && (
-        <div className="flex items-center justify-between px-4 py-2 bg-slate-800/80 border-b border-slate-700/50">
-          <span className="text-xs font-medium text-slate-400">{title}</span>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-slate-400 hover:text-white" onClick={handleCopy}>
+        <div className="flex items-center justify-between px-4 py-2 bg-slate-800/80 border-b border-slate-600/50">
+          <span className="text-xs font-medium text-slate-300">{title}</span>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-slate-300 hover:text-white" onClick={handleCopy}>
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             <span className="ml-1 text-xs">{copied ? 'Copied!' : 'Copy'}</span>
           </Button>
         </div>
       )}
       <pre ref={codeRef} className="p-4 overflow-x-auto text-sm leading-relaxed">
-        <code className="text-slate-300 font-mono whitespace-pre">{code}</code>
+        <code className="text-slate-200 font-mono whitespace-pre">{code}</code>
       </pre>
     </div>
   );
@@ -192,7 +192,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
 // ============================================
 function AsciiDiagram({ content }: { content: string }) {
   return (
-    <div className="rounded-xl border border-violet-500/20 bg-slate-950 p-5 overflow-x-auto shadow-lg shadow-violet-500/5">
+    <div className="rounded-xl border border-violet-500/30 bg-slate-900/80 p-5 overflow-x-auto shadow-lg shadow-violet-500/10">
       <pre className="text-xs sm:text-sm leading-relaxed font-mono text-violet-200 whitespace-pre">{content}</pre>
     </div>
   );
@@ -229,7 +229,7 @@ function StorySection({ topic }: { topic: Topic }) {
       </div>
       <div className="prose prose-invert max-w-none">
         {topic.story.split('\n\n').map((paragraph, i) => (
-          <p key={i} className="text-slate-300 leading-relaxed text-[15px] mb-4">
+          <p key={i} className="text-slate-200 leading-relaxed text-[15px] mb-4">
             {paragraph.split('**').map((segment, j) =>
               j % 2 === 1 ? <strong key={j} className="text-white font-semibold">{segment}</strong> : segment
             )}
@@ -238,7 +238,7 @@ function StorySection({ topic }: { topic: Topic }) {
       </div>
       <div className="flex flex-wrap gap-2 mt-4">
         {topic.subtopics.map((st, i) => (
-          <Badge key={i} variant="secondary" className="bg-slate-800 text-slate-300 border border-slate-700">
+          <Badge key={i} variant="secondary" className="bg-slate-800 text-slate-200 border border-slate-600">
             {st}
           </Badge>
         ))}
@@ -301,24 +301,24 @@ function StepsSection({ topic }: { topic: Topic }) {
       </div>
 
       {/* Current Step Detail */}
-      <Card className="bg-slate-900/80 border-slate-700/50">
+      <Card className="bg-slate-900/80 border-slate-600/50">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-mono text-emerald-400 flex items-center gap-2">
+          <CardTitle className="text-sm font-mono text-emerald-300 flex items-center gap-2">
             <ChevronRight className="w-4 h-4" />
             {topic.stepByStep[activeStep].line}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">What it does</span>
-            <p className="text-sm text-slate-300 mt-1">{topic.stepByStep[activeStep].explanation}</p>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">What it does</span>
+            <p className="text-sm text-slate-200 mt-1">{topic.stepByStep[activeStep].explanation}</p>
           </div>
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Memory Change</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Memory Change</span>
             <p className="text-sm text-violet-300 mt-1">{topic.stepByStep[activeStep].memoryChange}</p>
           </div>
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Output</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Output</span>
             <p className="text-sm text-amber-300 mt-1 font-mono">{topic.stepByStep[activeStep].output}</p>
           </div>
         </CardContent>
@@ -379,12 +379,12 @@ function SyntaxSection({ topic }: { topic: Topic }) {
           <p className="text-sm text-slate-400">Bookmark this for reference</p>
         </div>
       </div>
-      <div className="rounded-xl border-2 border-pink-500/30 bg-gradient-to-br from-slate-950 to-slate-900 p-5 shadow-lg shadow-pink-500/5">
-        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-pink-500/20">
+      <div className="rounded-xl border-2 border-pink-500/40 bg-gradient-to-br from-slate-900 to-slate-800 p-5 shadow-xl shadow-pink-500/10">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-pink-500/30">
           <BookMarked className="w-5 h-5 text-pink-400" />
-          <h3 className="text-sm font-bold text-pink-400 uppercase tracking-wider">{topic.syntaxCard.title}</h3>
+          <h3 className="text-sm font-bold text-pink-300 uppercase tracking-wider">{topic.syntaxCard.title}</h3>
         </div>
-        <pre className="text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap">{topic.syntaxCard.content}</pre>
+        <pre className="text-sm font-mono text-slate-200 leading-relaxed whitespace-pre-wrap bg-slate-950/50 p-4 rounded-lg border border-slate-700/50">{topic.syntaxCard.content}</pre>
       </div>
     </ContentSection>
   );
@@ -406,20 +406,20 @@ function MistakesSection({ topic }: { topic: Topic }) {
         </div>
       </div>
       {topic.mistakes.map((mistake, i) => (
-        <Card key={i} className="bg-slate-900/80 border-red-500/20 overflow-hidden">
-          <div className="bg-red-500/10 px-5 py-3 border-b border-red-500/20 flex items-center gap-2">
+        <Card key={i} className="bg-slate-900/80 border-red-500/30 overflow-hidden">
+          <div className="bg-red-500/10 px-5 py-3 border-b border-red-500/30 flex items-center gap-2">
             <X className="w-5 h-5 text-red-400" />
-            <span className="text-sm font-bold text-red-400">WRONG — Mistake #{i + 1}</span>
+            <span className="text-sm font-bold text-red-300">WRONG — Mistake #{i + 1}</span>
           </div>
           <CardContent className="pt-4 space-y-3">
             <CodeBlock code={mistake.wrong} title="Wrong Code" />
-            <p className="text-sm text-slate-300 flex items-start gap-2">
+            <p className="text-sm text-slate-200 flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               {mistake.explanation}
             </p>
-            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl px-5 py-3 flex items-center gap-2">
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-5 py-3 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              <span className="text-sm font-bold text-emerald-400">CORRECT</span>
+              <span className="text-sm font-bold text-emerald-300">CORRECT</span>
             </div>
             <CodeBlock code={mistake.correct} title="Correct Code" />
           </CardContent>
@@ -446,37 +446,37 @@ function LeetcodeSection({ topic }: { topic: Topic }) {
       </div>
 
       {/* Problem */}
-      <Card className="bg-slate-900/80 border-orange-500/20">
+      <Card className="bg-slate-900/80 border-orange-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-orange-400" />
-            <CardTitle className="text-base text-orange-400">Problem</CardTitle>
+            <CardTitle className="text-base text-orange-300">Problem</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <pre className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">{topic.leetcode.problem}</pre>
+          <pre className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed">{topic.leetcode.problem}</pre>
         </CardContent>
       </Card>
 
       {/* Approach */}
-      <Card className="bg-slate-900/80 border-sky-500/20">
+      <Card className="bg-slate-900/80 border-sky-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Lightbulb className="w-5 h-5 text-sky-400" />
-            <CardTitle className="text-base text-sky-400">Approach</CardTitle>
+            <CardTitle className="text-base text-sky-300">Approach</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-300 leading-relaxed">{topic.leetcode.approach}</p>
+          <p className="text-sm text-slate-200 leading-relaxed">{topic.leetcode.approach}</p>
         </CardContent>
       </Card>
 
       {/* Dry Run */}
-      <Card className="bg-slate-900/80 border-emerald-500/20">
+      <Card className="bg-slate-900/80 border-emerald-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Eye className="w-5 h-5 text-emerald-400" />
-            <CardTitle className="text-base text-emerald-400">Dry Run</CardTitle>
+            <CardTitle className="text-base text-emerald-300">Dry Run</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -488,15 +488,15 @@ function LeetcodeSection({ topic }: { topic: Topic }) {
       <CodeBlock code={topic.leetcode.code} title="Solution Code" />
 
       {/* Complexity */}
-      <Card className="bg-slate-900/80 border-violet-500/20">
+      <Card className="bg-slate-900/80 border-violet-500/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Cpu className="w-5 h-5 text-violet-400" />
-            <CardTitle className="text-base text-violet-400">Complexity Analysis</CardTitle>
+            <CardTitle className="text-base text-violet-300">Complexity Analysis</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <pre className="text-sm text-slate-300 whitespace-pre-wrap">{topic.leetcode.complexity}</pre>
+          <pre className="text-sm text-slate-200 whitespace-pre-wrap">{topic.leetcode.complexity}</pre>
         </CardContent>
       </Card>
     </ContentSection>
@@ -524,12 +524,12 @@ function CheckpointSection({ topic }: { topic: Topic }) {
         </div>
       </div>
 
-      <Card className="bg-slate-900/80 border-teal-500/20">
+      <Card className="bg-slate-900/80 border-teal-500/30">
         <CardContent className="pt-6">
           <h3 className="text-lg font-semibold text-white mb-5">{topic.checkpoint.question}</h3>
           <div className="space-y-3">
             {topic.checkpoint.options.map((option, i) => {
-              let optionClass = 'border-slate-700/50 hover:border-slate-600 hover:bg-slate-800/60';
+              let optionClass = 'border-slate-600/50 hover:border-slate-500 hover:bg-slate-800/60';
               if (answered) {
                 if (i === topic.checkpoint.answer) {
                   optionClass = 'border-emerald-500/50 bg-emerald-500/10';
@@ -560,11 +560,11 @@ function CheckpointSection({ topic }: { topic: Topic }) {
                         ? 'bg-emerald-500 text-white'
                         : answered && i === selectedAnswer && !isCorrect
                         ? 'bg-red-500 text-white'
-                        : 'bg-slate-800 text-slate-400'
+                        : 'bg-slate-800 text-slate-300'
                     }`}>
                       {answered && i === topic.checkpoint.answer ? '\u2713' : answered && i === selectedAnswer && !isCorrect ? '\u2717' : String.fromCharCode(65 + i)}
                     </span>
-                    <span className="text-sm text-slate-300">{option}</span>
+                    <span className="text-sm text-slate-200">{option}</span>
                   </div>
                 </button>
               );
@@ -589,7 +589,7 @@ function CheckpointSection({ topic }: { topic: Topic }) {
                   </>
                 )}
               </div>
-              <p className="text-sm text-slate-300">
+              <p className="text-sm text-slate-200">
                 {isCorrect
                   ? "You've understood this concept! The correct answer highlights the key idea. You're ready to move on to the next topic."
                   : `The correct answer is: ${topic.checkpoint.options[topic.checkpoint.answer]}. Don't worry — go back and re-read the story and memory sections. Try to understand WHY this answer is correct before moving on.`}
@@ -689,9 +689,9 @@ function LessonViewer() {
   const currentPhase = phases.find(p => p.id === topic.phaseId);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col min-h-0">
       {/* Topic Header */}
-      <div className="px-6 py-4 border-b border-slate-700/50 bg-slate-900/60">
+      <div className="shrink-0 px-6 py-4 border-b border-slate-700/50 bg-slate-900/60">
         <div className="flex items-center gap-3 mb-2">
           <Badge variant="secondary" className={`bg-gradient-to-r ${currentPhase?.color || 'from-slate-500 to-slate-600'} text-white text-xs`}>
             {currentPhase?.icon} {currentPhase?.title}
@@ -701,7 +701,7 @@ function LessonViewer() {
           </Badge>
         </div>
         <h1 className="text-2xl font-bold text-white">{topic.title}</h1>
-        <div className="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
+        <div className="flex items-center gap-2 mt-3 text-xs text-slate-400 flex-wrap">
           {topic.subtopics.map((st, i) => (
             <span key={i} className="flex items-center gap-1">
               {st}
@@ -712,7 +712,7 @@ function LessonViewer() {
       </div>
 
       {/* Section Tabs */}
-      <div className="px-6 py-2 border-b border-slate-700/50 bg-slate-900/40 overflow-x-auto">
+      <div className="shrink-0 px-6 py-2 border-b border-slate-700/50 bg-slate-900/40 overflow-x-auto">
         <div className="flex gap-1 min-w-max">
           {SECTION_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -723,8 +723,8 @@ function LessonViewer() {
                 onClick={() => setActiveSection(tab.id)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-slate-700/60 text-white'
-                    : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/40'
+                    ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/40'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
                 }`}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? tab.color : ''}`} />
@@ -736,7 +736,7 @@ function LessonViewer() {
       </div>
 
       {/* Lesson Content */}
-      <ScrollArea className="flex-1">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="px-6 py-6 max-w-4xl">
           {activeSection === 'story' && <StorySection key="story" topic={topic} />}
           {activeSection === 'memory' && <MemorySection key="memory" topic={topic} />}
@@ -747,10 +747,10 @@ function LessonViewer() {
           {activeSection === 'leetcode' && <LeetcodeSection key="leetcode" topic={topic} />}
           {activeSection === 'checkpoint' && <CheckpointSection key="checkpoint" topic={topic} />}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Bottom Navigation */}
-      <div className="px-6 py-3 border-t border-slate-700/50 bg-slate-900/60">
+      <div className="shrink-0 px-6 py-3 border-t border-slate-700/50 bg-slate-900/60">
         <CommandInput />
         <div className="flex items-center justify-between mt-3">
           <Button
@@ -835,7 +835,7 @@ export default function Home() {
         </header>
 
         {/* Lesson Viewer */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <LessonViewer />
         </div>
       </main>
