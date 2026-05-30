@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  /* config options here */
+  basePath: "/cpp",
+  trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
   },
