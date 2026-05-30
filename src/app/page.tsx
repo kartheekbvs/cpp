@@ -219,7 +219,10 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
   const [showStdin, setShowStdin] = useState(false);
   const [activeTab, setActiveTab] = useState<'output' | 'errors'>('output');
   const [isHorizontal, setIsHorizontal] = useState(true);
+  const [mobileView, setMobileView] = useState<'editor' | 'output'>('editor');
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const compilerRef = useRef<HTMLDivElement>(null);
 
   // Strip ANSI escape codes from compiler output
   const stripAnsi = (str: string) => str.replace(/\x1b\[[0-9;]*[a-zA-Z]|\x1b\[[0-9;]*m/g, '');
@@ -291,7 +294,7 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
   const hasErrors = output && output.stderr && output.stderr.trim().length > 0;
   const hasOutput = output && output.stdout && output.stdout.trim().length > 0;
 
-  // Output panel content (shared between split and stacked)
+  // Output panel content (shared between all layouts)
   const outputPanel = (
     <div className="flex flex-col h-full min-h-0">
       {/* Output Tabs */}
@@ -382,6 +385,39 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
     </div>
   );
 
+  // Mobile bottom bar (editor/output toggle + run button)
+  const mobileBottomBar = (
+    <div className="flex items-center gap-2 px-3 py-2 bg-slate-900/80 border-t border-slate-700/30 md:hidden">
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`flex-1 gap-1.5 ${mobileView === 'editor' ? 'text-sky-300 bg-sky-500/10' : 'text-slate-400'}`}
+        onClick={() => setMobileView('editor')}
+      >
+        <Code2 className="w-3.5 h-3.5" /> Editor
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`flex-1 gap-1.5 ${mobileView === 'output' ? 'text-emerald-300 bg-emerald-500/10' : 'text-slate-400'}`}
+        onClick={() => setMobileView('output')}
+      >
+        <Terminal className="w-3.5 h-3.5" /> Output
+        {hasOutput && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+        {hasErrors && <span className="w-1.5 h-1.5 rounded-full bg-red-400 ml-0.5" />}
+      </Button>
+      <Button
+        size="sm"
+        className={`text-white font-semibold gap-1.5 ${isCompiling ? 'bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+        onClick={compileAndRun}
+        disabled={isCompiling}
+      >
+        {isCompiling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+        Run
+      </Button>
+    </div>
+  );
+
   // Compact mode for Mistakes section (vertical, no split)
   if (compact) {
     return (
@@ -391,8 +427,16 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
           <div className="flex items-center gap-2">
             <Terminal className="w-3.5 h-3.5 text-sky-400" />
             <span className="text-xs font-bold text-sky-300 uppercase tracking-wider">Compiler</span>
-            <span className="text-xs text-slate-500">gcc 13.2 • C++17</span>
+            <span className="text-xs text-slate-500 hidden sm:inline">gcc 13.2 • C++17</span>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-slate-400 hover:text-white"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+          >
+            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </Button>
         </div>
         {/* Code Editor */}
         <textarea
@@ -400,13 +444,15 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck={false}
-          className="w-full min-h-[160px] max-h-[300px] p-3 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600"
+          className={`w-full p-3 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600 ${
+            isFullscreen ? 'min-h-[50vh]' : 'min-h-[160px] max-h-[300px]'
+          }`}
           placeholder="Type your C++ code here..."
         />
         {/* Controls */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-slate-900/60 border-t border-slate-700/30">
+        <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/60 border-t border-slate-700/30 flex-wrap">
           <Button size="sm" className={`text-white font-semibold gap-1.5 ${isCompiling ? 'bg-slate-600' : 'bg-emerald-600 hover:bg-emerald-700'}`} onClick={compileAndRun} disabled={isCompiling}>
-            {isCompiling ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Compiling...</> : <><Play className="w-3.5 h-3.5" /> Run</>}
+            {isCompiling ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Wait</> : <><Play className="w-3.5 h-3.5" /> Run</>}
           </Button>
           <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white gap-1" onClick={() => setShowStdin(!showStdin)}>
             <Terminal className="w-3 h-3" /> Stdin
@@ -421,7 +467,7 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
         {stdinSection}
         {/* Output */}
         {output && (
-          <div className="border-t border-slate-700/30 max-h-[200px] overflow-y-auto">
+          <div className={`border-t border-slate-700/30 overflow-y-auto ${isFullscreen ? 'max-h-[40vh]' : 'max-h-[200px]'}`}>
             {outputPanel}
           </div>
         )}
@@ -429,17 +475,19 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
     );
   }
 
-  // Full split-pane compiler for Code/LeetCode sections
+  // Full compiler for Code/LeetCode sections — responsive with mobile-first design
   return (
-    <div className="rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden">
+    <div ref={compilerRef} className={`rounded-xl border-2 border-sky-500/30 bg-gradient-to-br from-slate-950 to-slate-900 shadow-xl shadow-sky-500/5 overflow-hidden flex flex-col ${isFullscreen ? 'fixed inset-2 z-[100] rounded-xl' : ''}`}>
       {/* Compiler Header + Controls */}
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 border-b border-sky-500/30 flex-wrap">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-sky-400" />
-          <span className="text-xs font-bold text-sky-300 uppercase tracking-wider">C++ Compiler</span>
-          <span className="text-xs text-slate-500">gcc 13.2 • C++17</span>
+          <span className="text-xs font-bold text-sky-300 uppercase tracking-wider hidden sm:inline">C++ Compiler</span>
+          <span className="text-xs font-bold text-sky-300 uppercase tracking-wider sm:hidden">Compiler</span>
+          <span className="text-xs text-slate-500 hidden sm:inline">gcc 13.2 • C++17</span>
         </div>
-        <div className="flex items-center gap-1 ml-auto">
+        {/* Desktop controls — hidden on mobile */}
+        <div className="hidden md:flex items-center gap-1 ml-auto">
           <Button
             variant="ghost"
             size="sm"
@@ -497,10 +545,65 @@ function CppCompiler({ initialCode, compact = false }: { initialCode: string; co
             )}
           </Button>
         </div>
+        {/* Mobile controls — visible only on small screens */}
+        <div className="flex md:hidden items-center gap-1 ml-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`h-7 px-2 text-slate-400 hover:text-white gap-1 ${showStdin ? 'text-sky-300' : ''}`}
+            onClick={() => setShowStdin(!showStdin)}
+          >
+            <Terminal className="w-3 h-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-slate-400 hover:text-white gap-1"
+            onClick={() => { setCode(initialCode); setOutput(null); }}
+            title="Reset"
+          >
+            <RotateCcw className="w-3 h-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-slate-400 hover:text-white"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </Button>
+        </div>
       </div>
 
-      {/* Split Pane: Editor + Output */}
-      <div className={`flex ${isHorizontal ? 'flex-row' : 'flex-col'} min-h-[400px] max-h-[600px]`}>
+      {/* === Mobile Layout: Editor/Output tabs with bottom bar === */}
+      <div className="flex-1 flex flex-col min-h-0 md:hidden">
+        {/* Mobile Editor View */}
+        {mobileView === 'editor' && (
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <textarea
+              ref={textareaRef}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              onKeyDown={handleKeyDown}
+              spellCheck={false}
+              className="flex-1 w-full p-3 bg-slate-950 text-slate-200 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:ring-inset placeholder:text-slate-600 min-h-0"
+              placeholder="Type your C++ code here..."
+            />
+            {stdinSection}
+          </div>
+        )}
+        {/* Mobile Output View */}
+        {mobileView === 'output' && (
+          <div className="flex-1 min-h-0 overflow-hidden">
+            {outputPanel}
+          </div>
+        )}
+      </div>
+      {mobileBottomBar}
+
+      {/* === Desktop Layout: Split Pane === */}
+      <div className={`hidden md:flex ${isHorizontal ? 'flex-row' : 'flex-col'} flex-1 min-h-0`}>
         {/* Left: Code Editor */}
         <div className={`flex flex-col min-h-0 ${isHorizontal ? 'w-1/2 border-r border-slate-700/30' : 'border-b border-slate-700/30'}`}>
           <textarea
@@ -686,7 +789,9 @@ function CodeSection({ topic }: { topic: Topic }) {
         </div>
       </div>
       {/* Split IDE: Code + Compiler integrated */}
-      <CppCompiler initialCode={topic.code} />
+      <div className="min-h-[420px] md:min-h-[500px]">
+        <CppCompiler initialCode={topic.code} />
+      </div>
     </ContentSection>
   );
 }
