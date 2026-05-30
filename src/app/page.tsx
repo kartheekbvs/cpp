@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, Brain, Code2, AlertTriangle, Trophy, CheckCircle2,
   ChevronRight, ChevronLeft, Menu, X, Terminal, Cpu, Zap,
@@ -18,6 +17,15 @@ import { Progress as ProgressUI } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// ============================================
+// HYDRATION SAFE HOOK
+// ============================================
+function useHydrated() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => { setHydrated(true); }, []);
+  return hydrated;
+}
 
 // ============================================
 // SIDEBAR COMPONENT
@@ -93,44 +101,40 @@ function Sidebar() {
               <span className="text-base">{phase.icon}</span>
               <span className="flex-1 text-left truncate">{phase.title}</span>
               <span className="text-xs text-slate-500">{phase.topics.filter(t => isCompleted(t.id)).length}/{phase.topics.length}</span>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${expandedPhase === phase.id ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${expandedPhase === phase.id ? 'rotate-180' : ''}`} />
             </button>
-            <AnimatePresence>
-              {expandedPhase === phase.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  {phase.topics.map((topic) => {
-                    const isActive = currentTopicId === topic.id;
-                    const done = isCompleted(topic.id);
-                    return (
-                      <button
-                        key={topic.id}
-                        onClick={() => { setCurrentTopic(topic.id); setSidebarOpen(false); }}
-                        className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-1.5 text-sm rounded-lg transition-all ${
-                          isActive
-                            ? 'bg-emerald-500/15 text-emerald-400 font-medium'
-                            : done
-                            ? 'text-slate-300 hover:bg-slate-800/40'
-                            : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-300'
-                        }`}
-                      >
-                        {done ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                        ) : (
-                          <span className="w-3.5 h-3.5 rounded-full border border-slate-600 shrink-0" />
-                        )}
-                        <span className="truncate">{topic.id} — {topic.title}</span>
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div
+              className="overflow-hidden transition-all duration-200 ease-in-out"
+              style={{
+                maxHeight: expandedPhase === phase.id ? '2000px' : '0px',
+                opacity: expandedPhase === phase.id ? 1 : 0,
+              }}
+            >
+              {phase.topics.map((topic) => {
+                const isActive = currentTopicId === topic.id;
+                const done = isCompleted(topic.id);
+                return (
+                  <button
+                    key={topic.id}
+                    onClick={() => { setCurrentTopic(topic.id); setSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-2.5 pl-10 pr-3 py-1.5 text-sm rounded-lg transition-all ${
+                      isActive
+                        ? 'bg-emerald-500/15 text-emerald-400 font-medium'
+                        : done
+                        ? 'text-slate-300 hover:bg-slate-800/40'
+                        : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-300'
+                    }`}
+                  >
+                    {done ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    ) : (
+                      <span className="w-3.5 h-3.5 rounded-full border border-slate-600 shrink-0" />
+                    )}
+                    <span className="truncate">{topic.id} — {topic.title}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ))}
       </ScrollArea>
@@ -153,7 +157,7 @@ const SECTION_TABS = [
 ];
 
 // ============================================
-// CODE BLOCK COMPONENT WITH SYNTAX HIGHLIGHTING
+// CODE BLOCK COMPONENT
 // ============================================
 function CodeBlock({ code, title }: { code: string; title?: string }) {
   const [copied, setCopied] = useState(false);
@@ -195,11 +199,25 @@ function AsciiDiagram({ content }: { content: string }) {
 }
 
 // ============================================
+// CONTENT SECTION WRAPPER — CSS animation, always visible
+// ============================================
+function ContentSection({ children, sectionKey }: { children: React.ReactNode; sectionKey: string }) {
+  return (
+    <div
+      key={sectionKey}
+      className="space-y-5 animate-fade-in"
+    >
+      {children}
+    </div>
+  );
+}
+
+// ============================================
 // STORY SECTION
 // ============================================
 function StorySection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="story">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
           <Lightbulb className="w-5 h-5 text-white" />
@@ -225,7 +243,7 @@ function StorySection({ topic }: { topic: Topic }) {
           </Badge>
         ))}
       </div>
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -234,7 +252,7 @@ function StorySection({ topic }: { topic: Topic }) {
 // ============================================
 function MemorySection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="memory">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
           <Brain className="w-5 h-5 text-white" />
@@ -245,7 +263,7 @@ function MemorySection({ topic }: { topic: Topic }) {
         </div>
       </div>
       <AsciiDiagram content={topic.memoryViz} />
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -256,7 +274,7 @@ function StepsSection({ topic }: { topic: Topic }) {
   const [activeStep, setActiveStep] = useState(0);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="steps">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
           <Play className="w-5 h-5 text-white" />
@@ -283,38 +301,28 @@ function StepsSection({ topic }: { topic: Topic }) {
       </div>
 
       {/* Current Step Detail */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Card className="bg-slate-900/80 border-slate-700/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-mono text-emerald-400 flex items-center gap-2">
-                <ChevronRight className="w-4 h-4" />
-                {topic.stepByStep[activeStep].line}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">What it does</span>
-                <p className="text-sm text-slate-300 mt-1">{topic.stepByStep[activeStep].explanation}</p>
-              </div>
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Memory Change</span>
-                <p className="text-sm text-violet-300 mt-1">{topic.stepByStep[activeStep].memoryChange}</p>
-              </div>
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Output</span>
-                <p className="text-sm text-amber-300 mt-1 font-mono">{topic.stepByStep[activeStep].output}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </AnimatePresence>
+      <Card className="bg-slate-900/80 border-slate-700/50">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-mono text-emerald-400 flex items-center gap-2">
+            <ChevronRight className="w-4 h-4" />
+            {topic.stepByStep[activeStep].line}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">What it does</span>
+            <p className="text-sm text-slate-300 mt-1">{topic.stepByStep[activeStep].explanation}</p>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Memory Change</span>
+            <p className="text-sm text-violet-300 mt-1">{topic.stepByStep[activeStep].memoryChange}</p>
+          </div>
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Output</span>
+            <p className="text-sm text-amber-300 mt-1 font-mono">{topic.stepByStep[activeStep].output}</p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Play All Button */}
       <Button
@@ -332,7 +340,7 @@ function StepsSection({ topic }: { topic: Topic }) {
       >
         <Play className="w-4 h-4 mr-2" /> Auto-play all steps
       </Button>
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -341,7 +349,7 @@ function StepsSection({ topic }: { topic: Topic }) {
 // ============================================
 function CodeSection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="code">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
           <Code2 className="w-5 h-5 text-white" />
@@ -352,7 +360,7 @@ function CodeSection({ topic }: { topic: Topic }) {
         </div>
       </div>
       <CodeBlock code={topic.code} title={`${topic.title} — Full Example`} />
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -361,7 +369,7 @@ function CodeSection({ topic }: { topic: Topic }) {
 // ============================================
 function SyntaxSection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="syntax">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
           <BookMarked className="w-5 h-5 text-white" />
@@ -378,7 +386,7 @@ function SyntaxSection({ topic }: { topic: Topic }) {
         </div>
         <pre className="text-sm font-mono text-slate-300 leading-relaxed whitespace-pre-wrap">{topic.syntaxCard.content}</pre>
       </div>
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -387,7 +395,7 @@ function SyntaxSection({ topic }: { topic: Topic }) {
 // ============================================
 function MistakesSection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="mistakes">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/20">
           <AlertTriangle className="w-5 h-5 text-white" />
@@ -417,7 +425,7 @@ function MistakesSection({ topic }: { topic: Topic }) {
           </CardContent>
         </Card>
       ))}
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -426,7 +434,7 @@ function MistakesSection({ topic }: { topic: Topic }) {
 // ============================================
 function LeetcodeSection({ topic }: { topic: Topic }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="leetcode">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
           <Trophy className="w-5 h-5 text-white" />
@@ -491,7 +499,7 @@ function LeetcodeSection({ topic }: { topic: Topic }) {
           <pre className="text-sm text-slate-300 whitespace-pre-wrap">{topic.leetcode.complexity}</pre>
         </CardContent>
       </Card>
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -505,7 +513,7 @@ function CheckpointSection({ topic }: { topic: Topic }) {
   const isCorrect = answered && isCheckpointCorrect(topic.id, topic.checkpoint.answer);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+    <ContentSection sectionKey="checkpoint">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
           <CheckCircle2 className="w-5 h-5 text-white" />
@@ -554,7 +562,7 @@ function CheckpointSection({ topic }: { topic: Topic }) {
                         ? 'bg-red-500 text-white'
                         : 'bg-slate-800 text-slate-400'
                     }`}>
-                      {answered && i === topic.checkpoint.answer ? '✓' : answered && i === selectedAnswer && !isCorrect ? '✗' : String.fromCharCode(65 + i)}
+                      {answered && i === topic.checkpoint.answer ? '\u2713' : answered && i === selectedAnswer && !isCorrect ? '\u2717' : String.fromCharCode(65 + i)}
                     </span>
                     <span className="text-sm text-slate-300">{option}</span>
                   </div>
@@ -563,15 +571,11 @@ function CheckpointSection({ topic }: { topic: Topic }) {
             })}
           </div>
           {answered && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`mt-5 p-4 rounded-xl border-2 ${
-                isCorrect
-                  ? 'border-emerald-500/30 bg-emerald-500/10'
-                  : 'border-red-500/30 bg-red-500/10'
-              }`}
-            >
+            <div className={`mt-5 p-4 rounded-xl border-2 animate-fade-in ${
+              isCorrect
+                ? 'border-emerald-500/30 bg-emerald-500/10'
+                : 'border-red-500/30 bg-red-500/10'
+            }`}>
               <div className="flex items-center gap-2 mb-2">
                 {isCorrect ? (
                   <>
@@ -590,11 +594,11 @@ function CheckpointSection({ topic }: { topic: Topic }) {
                   ? "You've understood this concept! The correct answer highlights the key idea. You're ready to move on to the next topic."
                   : `The correct answer is: ${topic.checkpoint.options[topic.checkpoint.answer]}. Don't worry — go back and re-read the story and memory sections. Try to understand WHY this answer is correct before moving on.`}
               </p>
-            </motion.div>
+            </div>
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </ContentSection>
   );
 }
 
@@ -734,16 +738,14 @@ function LessonViewer() {
       {/* Lesson Content */}
       <ScrollArea className="flex-1">
         <div className="px-6 py-6 max-w-4xl">
-          <AnimatePresence mode="wait">
-            {activeSection === 'story' && <StorySection key="story" topic={topic} />}
-            {activeSection === 'memory' && <MemorySection key="memory" topic={topic} />}
-            {activeSection === 'steps' && <StepsSection key="steps" topic={topic} />}
-            {activeSection === 'code' && <CodeSection key="code" topic={topic} />}
-            {activeSection === 'syntax' && <SyntaxSection key="syntax" topic={topic} />}
-            {activeSection === 'mistakes' && <MistakesSection key="mistakes" topic={topic} />}
-            {activeSection === 'leetcode' && <LeetcodeSection key="leetcode" topic={topic} />}
-            {activeSection === 'checkpoint' && <CheckpointSection key="checkpoint" topic={topic} />}
-          </AnimatePresence>
+          {activeSection === 'story' && <StorySection key="story" topic={topic} />}
+          {activeSection === 'memory' && <MemorySection key="memory" topic={topic} />}
+          {activeSection === 'steps' && <StepsSection key="steps" topic={topic} />}
+          {activeSection === 'code' && <CodeSection key="code" topic={topic} />}
+          {activeSection === 'syntax' && <SyntaxSection key="syntax" topic={topic} />}
+          {activeSection === 'mistakes' && <MistakesSection key="mistakes" topic={topic} />}
+          {activeSection === 'leetcode' && <LeetcodeSection key="leetcode" topic={topic} />}
+          {activeSection === 'checkpoint' && <CheckpointSection key="checkpoint" topic={topic} />}
         </div>
       </ScrollArea>
 
@@ -784,17 +786,12 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-slate-950 overflow-hidden">
       {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/60 lg:hidden"
-            onClick={() => useLearningStore.getState().setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden transition-opacity duration-200"
+          onClick={() => useLearningStore.getState().setSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside className={`
