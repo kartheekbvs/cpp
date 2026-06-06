@@ -1181,6 +1181,21 @@ function LessonViewer() {
           {activeSection === 'leetcode' && <LeetcodeSection key="leetcode" topic={topic} />}
           {activeSection === 'checkpoint' && <CheckpointSection key="checkpoint" topic={topic} />}
         </div>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-800 mt-8 bg-slate-950/80">
+          <div className="px-6 py-6 max-w-5xl">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+              <p>&copy; {new Date().getFullYear()} C++ Mastery. All rights reserved.</p>
+              <div className="flex items-center gap-4">
+                <a href="/cpp/about/" className="hover:text-slate-300 transition-colors">About</a>
+                <a href="/cpp/contact/" className="hover:text-slate-300 transition-colors">Contact</a>
+                <a href="/cpp/privacy/" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
+                <a href="/cpp/terms/" className="hover:text-slate-300 transition-colors">Terms of Service</a>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Bottom Navigation */}
