@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-3">1. Introduction</h2>
             <p>
-              This Privacy Policy describes how C++ Mastery ("we," "our," or "us") collects, uses, and protects information when you visit our website at kartheekbvs.github.io/cpp (the "Site"). We are committed to safeguarding your privacy and ensuring transparency about our data practices. By accessing or using the Site, you agree to the practices described in this Privacy Policy. If you do not agree with any part of this policy, please discontinue use of the Site.
+              This Privacy Policy describes how C++ Mastery ("we," "our," or "us") collects, uses, and protects information when you visit our website at course.twss.shop (the "Site"). We are committed to safeguarding your privacy and ensuring transparency about our data practices. By accessing or using the Site, you agree to the practices described in this Privacy Policy. If you do not agree with any part of this policy, please discontinue use of the Site.
             </p>
           </section>
 
