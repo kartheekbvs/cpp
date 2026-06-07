@@ -34,7 +34,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
             <p>
-              By accessing and using C++ Mastery (the "Site"), available at course.twss.shop/cpp, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use the Site. These Terms apply to all visitors, users, and others who access or use the Site. We reserve the right to modify these Terms at any time, and your continued use of the Site after any changes constitutes your acceptance of the updated Terms.
+              By accessing and using C++ Mastery (the "Site"), available at kartheekbvs.github.io/cpp, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use the Site. These Terms apply to all visitors, users, and others who access or use the Site. We reserve the right to modify these Terms at any time, and your continued use of the Site after any changes constitutes your acceptance of the updated Terms.
             </p>
           </section>
 
